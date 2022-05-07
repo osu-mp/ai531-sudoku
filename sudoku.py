@@ -5,14 +5,8 @@
 # Joe Nguyen
 # Matthew Pacey
 
-import copy
-import random
-import time
-import utility
+from naked_singles import NakedSingles
 
-from queue import PriorityQueue
-from sys import maxsize
-from typing import Dict
 
 """
 Assignment Description
@@ -56,21 +50,20 @@ Report your results in the form of a mini-paper as you did for the other two ass
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
-    def __init__(self, puzzleStr):
+    def __init__(self, puzzle_str):
         """
         Init the Sudoku board with a puzzle string
         The board is a 3d array: board[row][col][values] where:
             row and col represent the 2D board (i.e. row=0, col=3 is the fourth cell in the first row)
             values is a list of possible numbers for the given cell at row,col
-            If a cell starts off as blank (0 in puzzleStr input) that means values 1-9 are valid
+            If a cell starts off as blank (0 in puzzle_str input) that means values 1-9 are valid
             The inference rules will reduce this list as they execute
             If values has only one number, that is the final value
         """
         self.board = []
-        self.buildBoardFromStr(puzzleStr)
-        self.print()
+        self.build_board_from_str(puzzle_str)
 
-    def buildBoardFromStr(self, puzzleStr):
+    def build_board_from_str(self, puzzle_str):
         """
         Given a string like below, convert it to the data structure used by the solvers
 
@@ -86,18 +79,18 @@ class Sudoku:
         000 002 019
         """
         # get rid of spaces and newlines
-        puzzleStr = puzzleStr.replace(' ', '')
-        puzzleStr = puzzleStr.replace('\n', '')
+        puzzle_str = puzzle_str.replace(' ', '')
+        puzzle_str = puzzle_str.replace('\n', '')
 
         # validate input
-        if len(puzzleStr) != 81:
+        if len(puzzle_str) != 81:
             raise Exception('Invalid puzzle, expected 81 numbers (0 for blank)')
 
         # init board (9x9 grid where each cell is a list of acceptable values 1-9)
         self.board = [[[0 for cell in range(9)] for col in range(9)] for row in range(9)]
         row = 0
         col = 0
-        for cell in puzzleStr.strip():
+        for cell in puzzle_str.strip():
             cell = int(cell)
             if cell == 0:
                 self.board[row][col] = list(range(1, 10))
@@ -109,15 +102,14 @@ class Sudoku:
                 col = 0
                 row += 1
 
-
-    def isBoardSolved(self):
+    def is_board_solved(self):
         """
         Return True if the all cells have valid values, else False
         :return:
         """
         raise Exception('not implemented')
 
-    def isBoardValid(self):
+    def is_board_valid(self):
         """
         Return True if all cells are consistent, otherwise False
         Only cells with a single value are checked (cells with multiple values are not final values)
@@ -129,7 +121,7 @@ class Sudoku:
         """
         Print the current board
         If simple is True, this prints a 9x9 grid of single values (blanks for unsolved cells)
-        If simple is False, this prints a 9x9 grid of 9x9 grids where each smaller grid
+        If simple is False, this prints a 9x9 grid of 3x3 grids where each smaller grid
         represents the possible values (blank value for invalid values)
         :return:
         """
@@ -148,13 +140,11 @@ class Sudoku:
                 if row in [2, 5]:               # print divider between each 3 rows
                     board += '-' * 11 + '\n'
         else:
-            # for complex prints, print a 9x9 grid for each cell in the larger 9x9 grid
-            # the smaller 9x9 grid will contain all acceptable values for that cell
+            # for complex prints, print a 3x3 grid for each cell in the larger 9x9 grid
+            # the smaller 3x3 grid will contain all acceptable values for that cell
             # if the cell is set, the final value will be in the center of the grid
-            # each row is 9 cells * 3
-            boardRow = '___|' * 9 + '\n'
-            # bigBoard = boardRow * 81
-            # bigBoard[0][1] = 'a'
+
+            # the big board is 9 cells by 3 rows/cols in each cell -> 27x27 grid
             bigBoard = [['_' for col in range(27)] for row in range(27)]
             for row in range(9):
                 for col in range(9):
@@ -163,13 +153,22 @@ class Sudoku:
                         bigBoard[row * 3 + 1][col * 3 + 1] = str(cell[0])       # put values in center
                     else:
                         for i in range(1, 10):
+                            # each cell looks like:
+                            # 123
+                            # 456
+                            # 789
+                            # where the cell shares multiple rows with 9 other cells
+                            # so we need to use the values 1-9 to find where those values go
                             if i in cell:
-                                bigBoard[row * 3 + (i - 1) // 3 ][col * 3 + (i - 1) % 3] = str(i)
-                                # 789
-                                # bigBoard[row * (3 + i % 3 - 1)][col * 3 + (i - 1) % 3] = str(i)
-                        # bigBoard[row * 3][col * 3] = '123'
-                    #     bigBoard[row * 3 + 1][col * 3] = '456'
-                    #     bigBoard[row * 3 + 2][col * 3] = '789'
+                                # only include values that apply for that cell
+                                # i.e. if 456 are disallowed because of other cells
+                                # the second row will be blank
+                                subRow = row * 3 + (i - 1) // 3
+                                subCol = col * 3 + (i - 1) % 3
+                                bigBoard[subRow][subCol] = str(i)
+
+            # create the string that will be used for the final printout
+            # use spacers between each cell
             board = ""
             rowCount = 0
             colCount = 0
@@ -177,7 +176,7 @@ class Sudoku:
                 for col in row:
                     board += col
                     colCount += 1
-                    if colCount == 3:
+                    if colCount == 3:       # new cell marker, add spacer
                         colCount = 0
                         board += ' '
                 board += '\n'
@@ -194,26 +193,27 @@ class Sudoku:
         """
         return self.print()
 
-
-
-    def generateChildren(self):
+    def init_inference(self):
         """
-        Generate valid children tile configurations given the current tiles
-        One child node for each direction the empty square can move
-        :return:
+        Run the initial inference after the puzzle has been initialized
+        For every cell that has a single value, eliminate that single value for
+        every other cell in that row, col and subgroup
         """
-        raise Exception('TODO (tile puzzle code below)')
-        children = []
+        for row in range(9):
+            for col in range(9):
+                cell = self.puzzle.board[row][col]
+                if len(cell) == 1:
+                    self.remove_poss_value(cell[0], row, col)
 
-        # get list of valid moves the empty tile can do
-        moves = self.getEmptyMoves()
-        for move in moves:
-            # copy tiles into new child node
-            tiles = copy.deepcopy(self.tiles)
-            child = Puzzle(tiles, self, move, 1)
-            # move the empty square in the child node
-            child.moveEmpty(move)
-            children.append(child)
+    def remove_poss_value(self, val, row, col):
+        # row
+        # col
+        # subgroup
+        raise Exception('TODO')
+        
+    def solve(self):
+        ns = NakedSingles(self)
 
-        return children
-
+        move_cnt = 0
+        while ns.evaluate():
+            move_cnt += 1

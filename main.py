@@ -103,6 +103,22 @@ ___ 789 ___ 789 ___ ___ 789 789 789
         result = board.print(simple=False)
         self.assertEqual(result, expected)
 
+    def test_solve_easy(self):
+        '''
+        Test solving easy puzzle
+        '''
+        puzzleStr = '''240 300 000 
+        000 520 407
+        000 046 008
+        610 700 084
+        009 060 500 
+        730 005 061 
+        100 470 000 
+        302 051 000 
+        000 002 019'''
+
+        sudoku = Sudoku(puzzleStr)
+        sudoku.solve()
 
 if __name__ == '__main__':
     unittest.main()
