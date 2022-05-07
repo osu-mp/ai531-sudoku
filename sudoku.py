@@ -50,7 +50,7 @@ Report your results in the form of a mini-paper as you did for the other two ass
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
-    def __init__(self, puzzle_str):
+    def __init__(self, puzzle_str, do_init_inference=True):
         """
         Init the Sudoku board with a puzzle string
         The board is a 3d array: board[row][col][values] where:
@@ -62,6 +62,9 @@ class Sudoku:
         """
         self.board = []
         self.build_board_from_str(puzzle_str)
+
+        if do_init_inference:
+            self.init_inference()
 
     def build_board_from_str(self, puzzle_str):
         """
@@ -237,7 +240,16 @@ class Sudoku:
                 result = True
 
         # find the subgroup for this cell and check all neighbors
-        # TODO
+        row_start = (row // 3) * 3      # start of the subgroup row and col
+        col_start = (col // 3) * 3      # round down to previous 3 group
+        for r in range(row_start, row_start + 3):
+            for c in range(col_start, col_start + 3):
+                if r == row and c == col:       # ignore cell with single value
+                    continue
+                # if the target value is a possible value, remove it
+                if val in self.board[r][c]:
+                    self.board[r][c].remove(val)
+
         return result
         
     def solve(self):

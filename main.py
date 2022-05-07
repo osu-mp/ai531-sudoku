@@ -11,6 +11,16 @@ import unittest
 
 from sudoku import Sudoku
 
+puzzle_1_easy = '''240 300 000 
+                000 520 407
+                000 046 008
+                610 700 084
+                009 060 500 
+                730 005 061 
+                100 470 000 
+                302 051 000 
+                000 002 019'''
+
 class TestSudoku(unittest.TestCase):
     """
     Unit tests and data collection for Sudoku routines
@@ -20,16 +30,7 @@ class TestSudoku(unittest.TestCase):
         Test initializing a puzzle with a puzzle string
         Validate print function works
         """
-        puzzleStr = '''240 300 000 
-000 520 407
-000 046 008
-610 700 084
-009 060 500 
-730 005 061 
-100 470 000 
-302 051 000 
-000 002 019'''
-
+        board = Sudoku(puzzle_1_easy, do_init_inference=False)
         expected = '''24 |3  |   
    |52 |4 7
    | 46|  8
@@ -43,7 +44,6 @@ class TestSudoku(unittest.TestCase):
    |  2| 19
 Solved cells: 33 (41%)
 '''
-        board = Sudoku(puzzleStr)
         result = board.print()
 
         self.assertEqual(result, expected)
@@ -53,15 +53,7 @@ Solved cells: 33 (41%)
         Test initializing a puzzle with a puzzle string
         Validate print complex function works
         """
-        puzzleStr = '''240 300 000 
-000 520 407
-000 046 008
-610 700 084
-009 060 500 
-730 005 061 
-100 470 000 
-302 051 000 
-000 002 019'''
+        board = Sudoku(puzzle_1_easy, do_init_inference=False)
 
         expected = '''___ ___ 123 ___ 123 123 123 123 123 
 _2_ _4_ 456 _3_ 456 456 456 456 456 
@@ -101,9 +93,42 @@ ___ 789 ___ 789 ___ ___ 789 789 789
                                                                                                             
 Solved cells: 33 (41%)
 '''
-        board = Sudoku(puzzleStr)
         result = board.print(simple=False)
         self.assertEqual(result, expected)
+
+    def test_remove_poss_value_row(self):
+        """
+        Functional test for remove_poss_value
+        validate possible values removed from row, col and group
+        """
+
+
+        sudoku = Sudoku(puzzle_1_easy, do_init_inference=False)
+
+        # expected possible values at row 0, col 2 before routine (all values since it is blank)
+        self.assertEqual(sudoku.board[0][2], [1, 2, 3, 4, 5, 6, 7, 8, 9])
+        # expected possible values at row 1, col 0 before (all values since it is blank)
+        self.assertEqual(sudoku.board[1][0], [1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+        # ROW TEST: verify 4 removed from possible values for row 0
+        row = 0
+        # run remove_poss for value of 4 at 0,1, verify 4 removed from column 1
+        sudoku.remove_poss_value(4, row, 1)
+        # 4 should now be missing from possible values in column 1
+        self.assertEqual(sudoku.board[row][2], [1, 2, 3, 5, 6, 7, 8, 9])
+
+        # COL TEST: verify 5 removed from possible values for column 3
+        col = 3
+        # run remove_poss for value of 7 at row 3, col 3 (second subgroup of row 1)
+        sudoku.remove_poss_value(7, 3, col)
+        # verify 7 removed from possible values for row 5, col 4 (same subgroup)
+        self.assertEqual(sudoku.board[5][col], [1, 2, 3, 4, 5, 6, 8, 9])
+
+        # SUBGROUP: remove 9 from bottom right subroup
+        # run remove_poss_values for value of 9 at 8,8, verify 9 removed from col 7 in row 6
+        sudoku.remove_poss_value(9, 8, 8)
+        # 2 should now be missing from possible values
+        self.assertEqual(sudoku.board[6][7], [1, 2, 3, 4, 5, 6, 7, 8])
 
     def test_solve_easy(self):
         '''
