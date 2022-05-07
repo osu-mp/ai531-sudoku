@@ -41,6 +41,7 @@ class TestSudoku(unittest.TestCase):
 1  |47 |   
 3 2| 51|   
    |  2| 19
+Solved cells: 33 (41%)
 '''
         board = Sudoku(puzzleStr)
         result = board.print()
@@ -98,6 +99,7 @@ ___ 789 ___ 789 ___ ___ 789 789 789
 456 456 456 456 456 _2_ 456 _1_ _9_ 
 789 789 789 789 789 ___ 789 ___ ___ 
                                                                                                             
+Solved cells: 33 (41%)
 '''
         board = Sudoku(puzzleStr)
         result = board.print(simple=False)
@@ -118,7 +120,10 @@ ___ 789 ___ 789 ___ ___ 789 789 789
         000 002 019'''
 
         sudoku = Sudoku(puzzleStr)
-        sudoku.solve()
+        sudoku.print(simple=False)
+        sudoku.init_inference()
+        sudoku.print(simple=False)
+        # sudoku.solve()
 
 if __name__ == '__main__':
     unittest.main()

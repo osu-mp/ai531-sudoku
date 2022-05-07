@@ -117,7 +117,7 @@ class Sudoku:
         """
         raise Exception('not implemented')
 
-    def print(self, simple=True):
+    def print(self, simple=True, screen=True):
         """
         Print the current board
         If simple is True, this prints a 9x9 grid of single values (blanks for unsolved cells)
@@ -125,6 +125,8 @@ class Sudoku:
         represents the possible values (blank value for invalid values)
         :return:
         """
+        solved = 0  # count number of solved cells
+
         if simple:
             board = ""
             for row in range(9):
@@ -132,6 +134,7 @@ class Sudoku:
                     cell = self.board[row][col]
                     if len(cell) == 1:
                         board += str(cell[0])
+                        solved += 1
                     else:
                         board += ' '
                     if col in [2, 5]:           # put divider between each 3 cols
@@ -151,6 +154,7 @@ class Sudoku:
                     cell = self.board[row][col]
                     if len(cell) == 1:
                         bigBoard[row * 3 + 1][col * 3 + 1] = str(cell[0])       # put values in center
+                        solved += 1
                     else:
                         for i in range(1, 10):
                             # each cell looks like:
@@ -184,6 +188,7 @@ class Sudoku:
                 if rowCount == 3:
                     board += ' ' * (81+27) + '\n'       # 81 numbers plus 27 spacers
                     rowCount = 0
+        board += 'Solved cells: %d (%2.f%%)\n' % (solved, solved * 100 / 81)
         print(board)
         return board                            # for unit tests
 
@@ -201,15 +206,39 @@ class Sudoku:
         """
         for row in range(9):
             for col in range(9):
-                cell = self.puzzle.board[row][col]
+                cell = self.board[row][col]
                 if len(cell) == 1:
-                    self.remove_poss_value(cell[0], row, col)
+                    cell_changed = self.remove_poss_value(cell[0], row, col)
 
     def remove_poss_value(self, val, row, col):
-        # row
-        # col
-        # subgroup
-        raise Exception('TODO')
+        """
+        Given a single value at row, col ensure that that value is not listed
+        as a possible value in any row, column or subgroup
+        Return True if any cell's possible values were updated
+        False if nothing is updated
+        """
+        result = False
+        # check row first by checking all cols in target row
+        for c in range(9):
+            if c == col:            # ignore the cell with the single value
+                continue
+            if val in self.board[row][c]:
+                self.board[row][c].remove(val)
+                # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
+                result = True
+
+        # check col next by checking all rows in target col
+        for r in range(9):
+            if r == row:            # ignore the cell with the single value
+                continue
+            if val in self.board[r][col]:
+                self.board[r][col].remove(val)
+                # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
+                result = True
+
+        # find the subgroup for this cell and check all neighbors
+        # TODO
+        return result
         
     def solve(self):
         ns = NakedSingles(self)
