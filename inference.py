@@ -18,8 +18,6 @@ class InferenceRule(ABC):
         If found:
             update inferred cell with value
             remove inferred value from possible values in row, col and subgroup
-            return True
-        Else:
-            return None
+        return count of cells changed
         """
         pass

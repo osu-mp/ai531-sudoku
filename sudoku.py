@@ -50,7 +50,7 @@ Report your results in the form of a mini-paper as you did for the other two ass
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
-    def __init__(self, puzzle_str, do_init_inference=True):
+    def __init__(self, puzzle_str):
         """
         Init the Sudoku board with a puzzle string
         The board is a 3d array: board[row][col][values] where:
@@ -62,9 +62,6 @@ class Sudoku:
         """
         self.board = []
         self.build_board_from_str(puzzle_str)
-
-        if do_init_inference:
-            self.init_inference()
 
     def build_board_from_str(self, puzzle_str):
         """
@@ -106,11 +103,19 @@ class Sudoku:
                 row += 1
 
     def is_board_solved(self):
+        raise Exception('TODO')
+
+    def is_board_filled(self):
         """
-        Return True if the all cells have valid values, else False
+        Return True if the all cells have a single value, else False
         :return:
         """
-        raise Exception('not implemented')
+        for row in range(9):
+            for col in range(9):
+                if len(self.board[row][col]) > 1:
+                    return False
+
+        return True
 
     def is_board_valid(self):
         """
@@ -207,20 +212,15 @@ class Sudoku:
         For every cell that has a single value, eliminate that single value for
         every other cell in that row, col and subgroup
         """
-        for row in range(9):
-            for col in range(9):
-                cell = self.board[row][col]
-                if len(cell) == 1:
-                    cell_changed = self.remove_poss_value(cell[0], row, col)
+        raise Exception('deprecated')
 
     def remove_poss_value(self, val, row, col):
         """
         Given a single value at row, col ensure that that value is not listed
         as a possible value in any row, column or subgroup
-        Return True if any cell's possible values were updated
-        False if nothing is updated
+        Return count of possible values removed (0 means no actions)
         """
-        result = False
+        count = 0
         # check row first by checking all cols in target row
         for c in range(9):
             if c == col:            # ignore the cell with the single value
@@ -228,7 +228,7 @@ class Sudoku:
             if val in self.board[row][c]:
                 self.board[row][c].remove(val)
                 # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
-                result = True
+                count += 1
 
         # check col next by checking all rows in target col
         for r in range(9):
@@ -237,7 +237,7 @@ class Sudoku:
             if val in self.board[r][col]:
                 self.board[r][col].remove(val)
                 # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
-                result = True
+                count += 1
 
         # find the subgroup for this cell and check all neighbors
         row_start = (row // 3) * 3      # start of the subgroup row and col
@@ -249,8 +249,9 @@ class Sudoku:
                 # if the target value is a possible value, remove it
                 if val in self.board[r][c]:
                     self.board[r][c].remove(val)
+                    count += 1
 
-        return result
+        return count
         
     def solve(self):
         ns = NakedSingles(self)

@@ -9,6 +9,7 @@ import csv
 import time
 import unittest
 
+from naked_singles import NakedSingles
 from sudoku import Sudoku
 
 puzzle_1_easy = '''240 300 000 
@@ -30,7 +31,7 @@ class TestSudoku(unittest.TestCase):
         Test initializing a puzzle with a puzzle string
         Validate print function works
         """
-        board = Sudoku(puzzle_1_easy, do_init_inference=False)
+        board = Sudoku(puzzle_1_easy)
         expected = '''24 |3  |   
    |52 |4 7
    | 46|  8
@@ -53,7 +54,7 @@ Solved cells: 33 (41%)
         Test initializing a puzzle with a puzzle string
         Validate print complex function works
         """
-        board = Sudoku(puzzle_1_easy, do_init_inference=False)
+        board = Sudoku(puzzle_1_easy)
 
         expected = '''___ ___ 123 ___ 123 123 123 123 123 
 _2_ _4_ 456 _3_ 456 456 456 456 456 
@@ -96,14 +97,12 @@ Solved cells: 33 (41%)
         result = board.print(simple=False)
         self.assertEqual(result, expected)
 
-    def test_remove_poss_value_row(self):
+    def test_remove_poss_value(self):
         """
         Functional test for remove_poss_value
-        validate possible values removed from row, col and group
+        validate possible values removed from row, col and subgroup
         """
-
-
-        sudoku = Sudoku(puzzle_1_easy, do_init_inference=False)
+        sudoku = Sudoku(puzzle_1_easy)
 
         # expected possible values at row 0, col 2 before routine (all values since it is blank)
         self.assertEqual(sudoku.board[0][2], [1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -130,24 +129,28 @@ Solved cells: 33 (41%)
         # 2 should now be missing from possible values
         self.assertEqual(sudoku.board[6][7], [1, 2, 3, 4, 5, 6, 7, 8])
 
-    def test_solve_easy(self):
+    def test_naked_singles(self):
+        """
+        Test naked singles on easy puzzle
+        """
+        sudoku = Sudoku(puzzle_1_easy)
+        print('Before naked singles:')
+        sudoku.print()
+        ns = NakedSingles(sudoku)
+        count = ns.evaluate()
+        print('After naked singles:')
+        sudoku.print()
+        self.assertEqual(count, 384, "There are 384 naked single moves in easy 1 puzzle")
+
+    def skip_test_solve_easy(self):
         '''
         Test solving easy puzzle
         '''
-        puzzleStr = '''240 300 000 
-        000 520 407
-        000 046 008
-        610 700 084
-        009 060 500 
-        730 005 061 
-        100 470 000 
-        302 051 000 
-        000 002 019'''
+        # TODO
+        sudoku = Sudoku(puzzle_1_easy)
 
-        sudoku = Sudoku(puzzleStr)
         sudoku.print(simple=False)
-        sudoku.init_inference()
-        sudoku.print(simple=False)
+        sudoku.print()
         # sudoku.solve()
 
 if __name__ == '__main__':
