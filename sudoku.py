@@ -298,16 +298,89 @@ class Sudoku:
 
         return count
 
-    def solve_brute_force_backtrack(self):
+    def is_row_valid(self, row):
+        """
+        Return True if the single values for each cell in the row are valid, else False
+        Valid means numbers 1 through 9 with no repeats
+        """
+        values = []
+        for col in range(9):
+            values.append(self.board[row][col])
+
+        return self.is_group_valid(values)
+
+    def is_col_valid(self, col):
+        """
+        Return True if the single values for each cell in the col are valid, else False
+        Valid means numbers 1 through 9 with no repeats
+        """
+        values = []
+        for row in range(9):
+            values.append(self.board[row][col])
+
+        return self.is_group_valid(values)
+
+    def is_subgroup_valid(self, row, col):
+        """
+        Return True if the single values for each cell in the 3x3 subgroup are valid, else False
+        Valid means numbers 1 through 9 with no repeats
+        """
+        values = [self.board[row][col]]
+        neighbor_json = self.get_group_neighbors(row, col)
+        for neighbor in json.loads(neighbor_json):
+            values.append(neighbor['val'])
+
+        return self.is_group_valid(values)
+
+    def is_group_valid(self, values):
+        """
+        Return True if the given values are valid (1-9 with no repeats)
+        Ignore values with multiple values as those cells are not set yet
+        Input can be row, col or subroup values
+        """
+        used = []
+        for value in values:
+            if len(value) > 1:          # ignore cells that do not have single values
+                continue
+            if value[0] in used:        # selected value already exists in input, return False
+                return False
+            used.append(value[0])       # otherwise add to used list
+
+        return True
+
+    def solve_brute_force_backtrack(self, start_row=0, start_col=0, count=0):
         """
         Brute force backtracking through possible values, cell by cell
         """
-        for row in range(9):
-            for col in range(9):
-                continue
+        # TODO not done yet
+        pass
+        '''
+        for row in range(start_row, 9):
+            for col in range(start_col, 9):
+                # if a cell has a single value, proceed to next
+                values = self.board[row][col]
+                if len(values) == 1:
+                    continue
+
+                while values:
+                    value = values.pop()
+                    self.board[row][col] = [value]
+                    if not self.is_row_valid(row):
+                        continue
+                    if not self.is_col_valid(col):
+                        continue
+                    if not self.is_subgroup_valid(row, col):
+                        continue
+
+                    if row == 8 and col == 8:
+                        return True
+                    return self.solve_brute_force_backtrack(row)
+                return False
+                # else, try every value
                 # TODO get recursion down
                 # if len(self.board[row][col]):
-        pass
+        return True
+        '''
 
     def solve(self):
         ns = NakedSingles(self)
