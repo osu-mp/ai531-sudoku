@@ -5,8 +5,7 @@
 # Joe Nguyen
 # Matthew Pacey
 
-import json
-
+from cell import Cell
 from naked_singles import NakedSingles
 
 
@@ -216,52 +215,54 @@ class Sudoku:
         """
         raise Exception('deprecated')
 
-    def get_row_neighbors(self, row, col,):
+    def get_row(self, row, omit_col=None):
         """
-        Given a cell, return addresses of all colunms in the given row
+        Get all cells in the given row
+        Optional: if an index is given for omit_col that column's cell will not be included
+            This is used when the caller wants to do something to everything except the given cell
         """
-        neighbors = []
-        for c in range(9):
-            if c == col:            # ignore the cell with the single value
+        cells = []
+        for col in range(9):
+            if omit_col is not None and omit_col == col:
                 continue
-            neighbors.append({'row': row,
-                              'col': c,
-                              'val': self.board[row][c]})
+            cell = Cell(row, col, self.board[row][col])
+            cells.append(cell)
 
-        return json.dumps(neighbors)
+        return cells
 
-    def get_col_neighbors(self, row, col):
+    def get_col(self, col, omit_row=None):
         """
-        Given a cell, return addresses of all rows in the same column
+        Get all cells in the given column
+        Optional: if an index is given for omit_row that row's cell will not be included
+            This is used when the caller wants to do something to everything except the given cell
         """
-        neighbors = []
-        for r in range(9):
-            if r == row:  # ignore the cell with the single value
+        cells = []
+        for row in range(9):
+            if omit_row is not None and omit_row == row:
                 continue
-            neighbors.append({'row': r,
-                              'col': col,
-                              'val': self.board[r][col]})
+            cell = Cell(row, col, self.board[row][col])
+            cells.append(cell)
 
-        return json.dumps(neighbors)
+        return cells
 
-    def get_group_neighbors(self, row, col):
+    def get_group(self, row, col, omit_cell=False):
         """
-        Given a cell, return addresses of all neighbors in 3s3 grid
+        Given a cell, return addresses/vals of all cells in that 3x3 group
+        If omit_cell is True, the given cell will not be included in the list
+        Default behavior is to include the given cll
         """
-        neighbors = []
+        cells = []
 
         row_start = (row // 3) * 3  # start of the subgroup row and col
         col_start = (col // 3) * 3  # round down to previous 3 group
         for r in range(row_start, row_start + 3):
             for c in range(col_start, col_start + 3):
-                if r == row and c == col:       # ignore the given cell
+                if omit_cell and r == row and c == col:       # ignore the given cell
                     continue
-                neighbors.append({'row': r,
-                              'col': c,
-                              'val': self.board[r][c]})
+                cell = Cell(r, c, self.board[r][c])
+                cells.append(cell)
 
-        return json.dumps(neighbors)
-
+        return cells
 
     def remove_poss_value(self, val, row, col):
         """
@@ -271,29 +272,23 @@ class Sudoku:
         """
         count = 0
         # check row first by checking all cols in target row
-        neighbors_json = self.get_row_neighbors(row, col)
-        for neighbor in json.loads(neighbors_json):
-            neighbor_col = neighbor['col']
-            if val in neighbor['val']:
-                self.board[row][neighbor_col].remove(val)
+        for neighbor in self.get_row(row, omit_col=col):
+            if val in neighbor.val:
+                self.board[row][neighbor.col].remove(val)
                 # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
         # check col next by checking all rows in target col
-        neighbors_json = self.get_col_neighbors(row, col)
-        for neighbor in json.loads(neighbors_json):
-            neighbor_row = neighbor['row']
-            if val in neighbor['val']:
-                self.board[neighbor_row][col].remove(val)
+        for neighbor in self.get_col(col, omit_row=row):
+            if val in neighbor.val:
+                self.board[neighbor.row][col].remove(val)
                 # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
         # find the subgroup for this cell and check all neighbors
-        neighbors_json = self.get_group_neighbors(row, col)
-        for neighbor in json.loads(neighbors_json):
-            neighbor_row, neighbor_col = neighbor['row'], neighbor['col']
-            if val in self.board[neighbor_row][neighbor_col]:
-                self.board[neighbor_row][neighbor_col].remove(val)
+        for neighbor in self.get_group(row, col, omit_cell=True):
+            if val in self.board[neighbor.row][neighbor.col]:
+                self.board[neighbor.row][neighbor.col].remove(val)
                 count += 1
 
         return count
@@ -325,10 +320,9 @@ class Sudoku:
         Return True if the single values for each cell in the 3x3 subgroup are valid, else False
         Valid means numbers 1 through 9 with no repeats
         """
-        values = [self.board[row][col]]
-        neighbor_json = self.get_group_neighbors(row, col)
-        for neighbor in json.loads(neighbor_json):
-            values.append(neighbor['val'])
+        values = []
+        for cell in self.get_group(row, col):
+            values.append(cell.val)
 
         return self.is_group_valid(values)
 
@@ -388,3 +382,4 @@ class Sudoku:
         move_cnt = 0
         while ns.evaluate():
             move_cnt += 1
+

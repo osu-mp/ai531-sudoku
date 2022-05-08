@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import unittest
 
 from inference import InferenceRule
 
@@ -29,3 +30,22 @@ class NakedSingles(InferenceRule):
                             cell_changed = True
 
         return count
+
+    def evaluate_group(self, values):
+        """
+        Given a list of cells with multiple values, find a match
+        """
+
+class TestNakeSingles(unittest.TestCase):
+    def test_evaluate_group(self):
+        values = [
+            [2, 6, 7],      # naked 7
+            [2, 6],
+            [2, 6],
+            [2, 5, 6],
+            [4, 5]          # nake 4
+        ]
+        pass
+
+if __name__ == '__main__':
+    unittest.main()
