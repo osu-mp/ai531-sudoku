@@ -252,7 +252,18 @@ class Sudoku:
                     count += 1
 
         return count
-        
+
+    def solve_brute_force_backtrack(self):
+        """
+        Brute force backtracking through possible values, cell by cell
+        """
+        for row in range(9):
+            for col in range(9):
+                continue
+                # TODO get recursion down
+                # if len(self.board[row][col]):
+        pass
+
     def solve(self):
         ns = NakedSingles(self)
 
