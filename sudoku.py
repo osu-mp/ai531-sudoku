@@ -5,6 +5,8 @@
 # Joe Nguyen
 # Matthew Pacey
 
+import json
+
 from naked_singles import NakedSingles
 
 
@@ -214,6 +216,53 @@ class Sudoku:
         """
         raise Exception('deprecated')
 
+    def get_row_neighbors(self, row, col,):
+        """
+        Given a cell, return addresses of all colunms in the given row
+        """
+        neighbors = []
+        for c in range(9):
+            if c == col:            # ignore the cell with the single value
+                continue
+            neighbors.append({'row': row,
+                              'col': c,
+                              'val': self.board[row][c]})
+
+        return json.dumps(neighbors)
+
+    def get_col_neighbors(self, row, col):
+        """
+        Given a cell, return addresses of all rows in the same column
+        """
+        neighbors = []
+        for r in range(9):
+            if r == row:  # ignore the cell with the single value
+                continue
+            neighbors.append({'row': r,
+                              'col': col,
+                              'val': self.board[r][col]})
+
+        return json.dumps(neighbors)
+
+    def get_group_neighbors(self, row, col):
+        """
+        Given a cell, return addresses of all neighbors in 3s3 grid
+        """
+        neighbors = []
+
+        row_start = (row // 3) * 3  # start of the subgroup row and col
+        col_start = (col // 3) * 3  # round down to previous 3 group
+        for r in range(row_start, row_start + 3):
+            for c in range(col_start, col_start + 3):
+                if r == row and c == col:       # ignore the given cell
+                    continue
+                neighbors.append({'row': r,
+                              'col': c,
+                              'val': self.board[r][c]})
+
+        return json.dumps(neighbors)
+
+
     def remove_poss_value(self, val, row, col):
         """
         Given a single value at row, col ensure that that value is not listed
@@ -222,34 +271,30 @@ class Sudoku:
         """
         count = 0
         # check row first by checking all cols in target row
-        for c in range(9):
-            if c == col:            # ignore the cell with the single value
-                continue
-            if val in self.board[row][c]:
-                self.board[row][c].remove(val)
+        neighbors_json = self.get_row_neighbors(row, col)
+        for neighbor in json.loads(neighbors_json):
+            neighbor_col = neighbor['col']
+            if val in neighbor['val']:
+                self.board[row][neighbor_col].remove(val)
                 # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
         # check col next by checking all rows in target col
-        for r in range(9):
-            if r == row:            # ignore the cell with the single value
-                continue
-            if val in self.board[r][col]:
-                self.board[r][col].remove(val)
+        neighbors_json = self.get_col_neighbors(row, col)
+        for neighbor in json.loads(neighbors_json):
+            neighbor_row = neighbor['row']
+            if val in neighbor['val']:
+                self.board[neighbor_row][col].remove(val)
                 # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
         # find the subgroup for this cell and check all neighbors
-        row_start = (row // 3) * 3      # start of the subgroup row and col
-        col_start = (col // 3) * 3      # round down to previous 3 group
-        for r in range(row_start, row_start + 3):
-            for c in range(col_start, col_start + 3):
-                if r == row and c == col:       # ignore cell with single value
-                    continue
-                # if the target value is a possible value, remove it
-                if val in self.board[r][c]:
-                    self.board[r][c].remove(val)
-                    count += 1
+        neighbors_json = self.get_group_neighbors(row, col)
+        for neighbor in json.loads(neighbors_json):
+            neighbor_row, neighbor_col = neighbor['row'], neighbor['col']
+            if val in self.board[neighbor_row][neighbor_col]:
+                self.board[neighbor_row][neighbor_col].remove(val)
+                count += 1
 
         return count
 
