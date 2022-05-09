@@ -9,6 +9,7 @@ import csv
 import time
 import unittest
 
+from hidden_singles import HiddenSingles
 from naked_singles import NakedSingles
 from sudoku import Sudoku
 
@@ -139,6 +140,20 @@ Solved cells: 33 (41%)
         ns = NakedSingles(sudoku)
         count = ns.evaluate()
         print('After naked singles:')
+        sudoku.print()
+        self.assertEqual(count, 384, "There are 384 naked single moves in easy 1 puzzle")
+
+    def test_hidden_singles(self):
+        """
+        Test hidden singles on easy puzzle
+        """
+        sudoku = Sudoku(puzzle_1_easy)
+        print('Before hidden singles:')
+        sudoku.print()
+        hs = HiddenSingles(sudoku)
+        count = hs.evaluate()
+        # TODO
+        print('After hidden singles:')
         sudoku.print()
         self.assertEqual(count, 384, "There are 384 naked single moves in easy 1 puzzle")
 

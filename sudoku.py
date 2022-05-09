@@ -6,6 +6,7 @@
 # Matthew Pacey
 
 from cell import Cell
+from hidden_singles import HiddenSingles
 from naked_singles import NakedSingles
 
 
@@ -79,9 +80,10 @@ class Sudoku:
         302 051 000
         000 002 019
         """
-        # get rid of spaces and newlines
+        # get rid of spaces and newlines, tabs
         puzzle_str = puzzle_str.replace(' ', '')
         puzzle_str = puzzle_str.replace('\n', '')
+        puzzle_str = puzzle_str.replace('\t', '')
 
         # validate input
         if len(puzzle_str) != 81:
@@ -105,6 +107,19 @@ class Sudoku:
 
     def is_board_solved(self):
         raise Exception('TODO')
+
+    def get_solved_cell_count(self):
+        """
+        Return the number of solved cells (only have 1 possible value)
+        :return:
+        """
+        count = 0
+        for row in range(9):
+            for col in range(9):
+                if len(self.board[row][col]) == 1:
+                    count += 1
+
+        return count
 
     def is_board_filled(self):
         """
@@ -377,9 +392,29 @@ class Sudoku:
         '''
 
     def solve(self):
-        ns = NakedSingles(self)
+        """
+        Try to solve this puzzle using inference rules
+        """
 
+        ns = NakedSingles(self)
+        hs = HiddenSingles(self)
         move_cnt = 0
-        while ns.evaluate():
-            move_cnt += 1
+
+        while True:
+            solved_count = self.get_solved_cell_count()
+
+            while ns.evaluate():
+                move_cnt += 1
+
+            # TODO : hidden sinlges evalute gets stuck in infinite loop, not sure why right now
+            # while hs.evaluate():
+            #     move_cnt += 1
+
+            # if no new cells were solved, exit
+            if solved_count == self.get_solved_cell_count():
+                break
+
+        return move_cnt
+
+
 

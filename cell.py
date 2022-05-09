@@ -11,3 +11,9 @@ class Cell:
         self.row = row
         self.col = col
         self.val = val
+
+    def __eq__(self, other):
+        """
+        Compare two cells (used for tests)
+        """
+        return self.row == other.row and self.col == other.col and self.val == other.val
