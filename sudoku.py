@@ -437,12 +437,13 @@ class Sudoku:
 
         return True
 
-    def solve_brute_force_backtrack(self, start_row=0, start_col=0, count=0):
+    def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
         """
-        Brute force backtracking through possible values, cell by cell
+        backtracking through possible values, cell by cell
         """
         # TODO not done yet
-        raise Exception('TODO: Joe or Wadood')
+        # NOTE: write tests in main.py (or other file)
+        raise Exception('TODO: Wadood')
         '''
         for row in range(start_row, 9):
             for col in range(start_col, 9):
@@ -470,6 +471,14 @@ class Sudoku:
                 # if len(self.board[row][col]):
         return True
         '''
+
+
+    def solve_most_constrained_var(self):
+        """
+
+        """
+        # TODO get most constrained variable
+        raise Exception('TODO Joe')
 
     def solve(self):
         """

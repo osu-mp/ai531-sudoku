@@ -14,7 +14,7 @@ from hidden_singles import HiddenSingles
 from naked_singles import NakedSingles
 from sudoku import Sudoku
 
-puzzle_1_easy = '''240 300 000 
+puzzle_1_easy = '''240 300 000  
                 000 520 407
                 000 046 008
                 610 700 084

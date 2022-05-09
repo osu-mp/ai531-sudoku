@@ -3,7 +3,7 @@ To run all tests:
 > python .\main.py
 
 To run data collection (try to solve all input test puzzles in puzzles.txt)
-> python .\data_collection.p
+> python .\data_collection.py
 This currently fails but should eventually report runtimes of the various configs for each puzzle
 
 INFO:
@@ -32,7 +32,7 @@ sudoku.print(simple=False)
 Prints something like below. Each 3x3 grid represents a single cell and possible values
 I.e. the top left cell is 2, neighbor to the right is 4, next right neighbor can be any number (inference rule should remove 2 and 4)
 ___ ___ 123 ___ 123 123 123 123 123
-_2_ _4_ 456 _3_ 456 456 456 456 456
+_8_ _4_ 456 _3_ 456 456 456 456 456
 ___ ___ 789 ___ 789 789 789 789 789
 
 123 123 123 ___ ___ 123 ___ 123 ___
@@ -68,11 +68,13 @@ ___ 789 ___ 789 ___ ___ 789 789 789
 789 789 789 789 789 ___ 789 ___ ___
 
 TODO:
-backtracking solver (brute force)(solve_brute_force_backtrack)
-naked pairs (started)
-hidden pairs
-naked triples
-hidden triples
-ability to tell solve which inference rules to include/exclude
+Wadood - backtracking solver (brute force)(solve_brute_force_backtrack)
+Wadood naked pairs (started)
+Wadood hidden pairs
+Joe naked triples
+Joe hidden triples
+Joe Backtracking for MCV (solve_most_constrained_var))
+Matthew ability to tell solve which inference rules to include/exclude
+breakout condition - 1000
 timer/data collection for solve (using previous line)
 
