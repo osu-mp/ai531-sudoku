@@ -139,7 +139,34 @@ class Sudoku:
         Only cells with a single value are checked (cells with multiple values are not final values)
         To be consistent each row, col and 3x3 grid can only have 1-9 (no repeats)
         """
-        raise Exception('not implemented')
+        # check all rows
+        for row in range(9):
+            cells = self.get_row(row)
+            if not self.is_cell_group_valid(cells):
+                self.print()
+                raise Exception(f'Row invalid: {row}')
+
+        # check all cols
+        for col in range(9):
+            cells = self.get_row(row)
+            if not self.is_cell_group_valid(cells):
+                raise Exception(f'Col invalid: {col}')
+
+        # check all regions
+        for reg in range(9):
+            cells = self.get_region(reg)
+            if not self.is_cell_group_valid(cells):
+                raise Exception(f'Region invalid: {reg}')
+
+    def is_cell_group_valid(self, cells):
+        """
+        Given a group of 9 cells (row, col or region), return True if the current config is valid, else False
+        The config is valid if cells that only have 1 number do not have any repeats in other numbers
+        """
+        values = []
+        for cell in cells:
+            values.append(cell.val)
+        return self.is_group_valid(values)
 
     def print(self, simple=True, screen=True):
         """
@@ -222,14 +249,6 @@ class Sudoku:
         """
         return self.print()
 
-    def init_inference(self):
-        """
-        Run the initial inference after the puzzle has been initialized
-        For every cell that has a single value, eliminate that single value for
-        every other cell in that row, col and subgroup
-        """
-        raise Exception('deprecated')
-
     def get_row(self, row, omit_col=None):
         """
         Get all cells in the given row
@@ -279,11 +298,38 @@ class Sudoku:
 
         return cells
 
+    def get_region(self, region_num):
+        """
+        Return the cells in the given region number
+        The regions are numbered 0 through 8, 0 is the upper left, 8 is the lower right
+        """
+        if region_num == 0:                     # top left
+            return self.get_group(0, 0)
+        elif region_num == 1:
+            return self.get_group(0, 3)         # top mid
+        elif region_num == 2:
+            return self.get_group(0, 6)         # top right
+        elif region_num == 3:
+            return self.get_group(3, 0)         # left mid
+        elif region_num == 4:
+            return self.get_group(3, 3)         # center
+        elif region_num == 5:
+            return self.get_group(3, 6)         # right mid
+        elif region_num == 6:
+            return self.get_group(6, 0)         # bottom left
+        elif region_num == 7:
+            return self.get_group(6, 3)         # bottom mid
+        elif region_num == 8:
+            return self.get_group(6, 6)         # bottom right
+        raise Exception('Invalid region: %d' % region_num)
+
     def remove_poss_value(self, cell: Cell):
         """
         Given a single value at row, col ensure that that value is not listed
         as a possible value in any row, column or subgroup
         Return count of possible values removed (0 means no actions)
+
+        This should be called whenever a number is assigned (remove that number as possible from related cells)
         """
         count = 0
         row = cell.row
@@ -353,7 +399,9 @@ class Sudoku:
         """
         used = []
         for value in values:
-            if len(value) > 1:          # ignore cells that do not have single values
+            if len(value) == 0:         # group must have 1 or more values
+                return False
+            elif len(value) > 1:          # ignore cells that do not have single values
                 continue
             if value[0] in used:        # selected value already exists in input, return False
                 return False

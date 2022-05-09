@@ -5,8 +5,6 @@ import unittest
 from cell import Cell
 from inference import InferenceRule
 
-max_moves = 1000
-
 class HiddenSingles(InferenceRule):
     def evaluate(self):
         """
@@ -24,6 +22,8 @@ class HiddenSingles(InferenceRule):
         cell_changed = True  # run init at least once
         while cell_changed:  # keep running when a change is made
             cell_changed = False  # this ensures a change is made every loop
+
+            # check rows
             for row in range(9):
                 cells = self.puzzle.get_row(row)
                 matches = self.evaluate_group(cells)
@@ -32,11 +32,30 @@ class HiddenSingles(InferenceRule):
                     changed = self.puzzle.remove_poss_value(match)
                     count += changed
                     cell_changed = True
+                    self.puzzle.is_board_valid()
 
-                if count > max_moves:
-                    cell_changed = False
-            # TODO cols
-            # TODO groups
+            # TODO : col check is leading to invalid rows, not sure why
+            # # check cols
+            # for col in range(9):
+            #     cells = self.puzzle.get_col(col)
+            #     matches = self.evaluate_group(cells)
+            #     for match in matches:
+            #         self.puzzle.board[match.row][match.col] = [match.val]
+            #         changed = self.puzzle.remove_poss_value(match)
+            #         count += changed
+            #         cell_changed = True
+            #         self.puzzle.is_board_valid()
+
+            # # check groups
+            # for n in range(9):
+            #     cells = self.puzzle.get_region(n)
+            #     matches = self.evaluate_group(cells)
+            #     for match in matches:
+            #         self.puzzle.board[match.row][match.col] = [match.val]
+            #         changed = self.puzzle.remove_poss_value(match)
+            #         count += changed
+            #         cell_changed = True
+            #         self.puzzle.is_board_valid()
 
         return count
 
