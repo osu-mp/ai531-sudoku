@@ -344,6 +344,10 @@ class Sudoku:
                 # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
+                # TODO : if the updated cell only has one value, update its neighbors
+                # if len(self.board[row][neighbor.col]) == 1:
+                #     count += self.solve_cell(Cell(row, neighbor.col, self.board[row][neighbor.col][0]))
+
                 # TODO : mpacey added this to debug that board is always in a good state
                 # it will decrease performance, so it should be removed once the
                 # algo has been verified more
@@ -356,6 +360,10 @@ class Sudoku:
                 # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
+                # TODO : if the updated cell only has one value, update its neighbors
+                # if len(self.board[neighbor.row][col]) == 1:
+                #     count += self.solve_cell(Cell(row, neighbor.col, self.board[neighbor.row][col][0]))
+
                 # TODO : mpacey added this to debug that board is always in a good state
                 # it will decrease performance, so it should be removed once the
                 # algo has been verified more
@@ -366,6 +374,10 @@ class Sudoku:
             if val in self.board[neighbor.row][neighbor.col]:
                 self.board[neighbor.row][neighbor.col].remove(val)
                 count += 1
+
+                # TODO : if the updated cell only has one value, update its neighbors
+                # if len(self.board[neighbor.row][neighbor.col]) == 1:
+                #     count += self.solve_cell(Cell(neighbor.row, neighbor.col, self.board[neighbor.row][neighbor.col][0]))
 
                 # TODO : mpacey added this to debug that board is always in a good state
                 # it will decrease performance, so it should be removed once the

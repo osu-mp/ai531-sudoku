@@ -17,3 +17,9 @@ class Cell:
         Compare two cells (used for tests)
         """
         return self.row == other.row and self.col == other.col and self.val == other.val
+
+    def __str__(self):
+        """
+        Print cell
+        """
+        return(f'Cell: {self.row},{self.col} = {self.val}')

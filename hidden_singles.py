@@ -27,8 +27,15 @@ class HiddenSingles(InferenceRule):
             for row in range(9):
                 cells = self.puzzle.get_row(row)
                 matches = self.evaluate_group(cells)
+                # print(f'Current puzzle, checking row {row}')
+                # self.puzzle.print(simple=False)
                 for match in matches:
-                    self.puzzle.board[match.row][match.col] = [match.val]
+                    # print(f'Operating on match: {match}')
+                    try:
+                        self.puzzle.board[match.row][match.col] = [match.val]
+                    except:
+                        # TODO figure out why bottom row gets into bad state for 10 medium
+                        raise
                     changed = self.puzzle.solve_cell(match)
                     count += changed
                     cell_changed = True
