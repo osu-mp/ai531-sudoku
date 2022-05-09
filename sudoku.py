@@ -343,6 +343,11 @@ class Sudoku:
                 # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
+                # TODO : mpacey added this to debug that board is always in a good state
+                # it will decrease performance, so it should be removed once the
+                # algo has been verified more
+                self.is_board_valid()
+
         # check col next by checking all rows in target col
         for neighbor in self.get_col(col, omit_row=row):
             if val in neighbor.val:
@@ -350,11 +355,21 @@ class Sudoku:
                 # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
                 count += 1
 
+                # TODO : mpacey added this to debug that board is always in a good state
+                # it will decrease performance, so it should be removed once the
+                # algo has been verified more
+                self.is_board_valid()
+
         # find the subgroup for this cell and check all neighbors
         for neighbor in self.get_group(row, col, omit_cell=True):
             if val in self.board[neighbor.row][neighbor.col]:
                 self.board[neighbor.row][neighbor.col].remove(val)
                 count += 1
+
+                # TODO : mpacey added this to debug that board is always in a good state
+                # it will decrease performance, so it should be removed once the
+                # algo has been verified more
+                self.is_board_valid()
 
         return count
 
@@ -414,7 +429,7 @@ class Sudoku:
         Brute force backtracking through possible values, cell by cell
         """
         # TODO not done yet
-        pass
+        raise Exception('TODO: Joe or Wadood')
         '''
         for row in range(start_row, 9):
             for col in range(start_col, 9):
