@@ -26,7 +26,7 @@ class NakedSingles(InferenceRule):
                     value = self.puzzle.board[row][col]
                     if len(value) == 1:
                         cell = Cell(row, col, value[0])
-                        changed = self.puzzle.remove_poss_value(cell)
+                        changed = self.puzzle.solve_cell(cell)
                         if changed:
                             count += changed
                             cell_changed = True

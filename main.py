@@ -127,7 +127,7 @@ Solved cells: 33 (41%)
         row = 0
         # run remove_poss for value of 4 at 0,1, verify 4 removed from column 1
         cell = Cell(row, 1, 4)
-        sudoku.remove_poss_value(cell)
+        sudoku.solve_cell(cell)
         # 4 should now be missing from possible values in column 1
         self.assertEqual(sudoku.board[row][2], [1, 2, 3, 5, 6, 7, 8, 9])
 
@@ -135,14 +135,14 @@ Solved cells: 33 (41%)
         col = 3
         # run remove_poss for value of 7 at row 3, col 3 (second subgroup of row 1)
         cell = Cell(3, col, 7)
-        sudoku.remove_poss_value(cell)
+        sudoku.solve_cell(cell)
         # verify 7 removed from possible values for row 5, col 4 (same subgroup)
         self.assertEqual(sudoku.board[5][col], [1, 2, 3, 4, 5, 6, 8, 9])
 
         # SUBGROUP: remove 9 from bottom right subroup
         # run remove_poss_values for value of 9 at 8,8, verify 9 removed from col 7 in row 6
         cell = Cell(8, 8, 9)
-        sudoku.remove_poss_value(cell)
+        sudoku.solve_cell(cell)
         # 2 should now be missing from possible values
         self.assertEqual(sudoku.board[6][7], [1, 2, 3, 4, 5, 6, 7, 8])
 

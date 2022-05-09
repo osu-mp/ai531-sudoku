@@ -323,10 +323,11 @@ class Sudoku:
             return self.get_group(6, 6)         # bottom right
         raise Exception('Invalid region: %d' % region_num)
 
-    def remove_poss_value(self, cell: Cell):
+    def solve_cell(self, cell: Cell):
         """
-        Given a single value at row, col ensure that that value is not listed
-        as a possible value in any row, column or subgroup
+        Given a cell  (at row,col) set the value for that cell and remove that value from
+        all neighbors in the same row, col and 3x3 region
+
         Return count of possible values removed (0 means no actions)
 
         This should be called whenever a number is assigned (remove that number as possible from related cells)
