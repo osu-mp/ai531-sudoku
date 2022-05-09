@@ -28,7 +28,8 @@ class HiddenSingles(InferenceRule):
                 cells = self.puzzle.get_row(row)
                 matches = self.evaluate_group(cells)
                 for match in matches:
-                    changed = self.puzzle.remove_poss_value(match.row, match.col, match.val)
+                    self.puzzle.board[match.row][match.col] = [match.val]
+                    changed = self.puzzle.remove_poss_value(match)
                     count += changed
                     cell_changed = True
 

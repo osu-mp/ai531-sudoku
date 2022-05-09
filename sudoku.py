@@ -279,13 +279,17 @@ class Sudoku:
 
         return cells
 
-    def remove_poss_value(self, val, row, col):
+    def remove_poss_value(self, cell: Cell):
         """
         Given a single value at row, col ensure that that value is not listed
         as a possible value in any row, column or subgroup
         Return count of possible values removed (0 means no actions)
         """
         count = 0
+        row = cell.row
+        col = cell.col
+        val = cell.val
+
         # check row first by checking all cols in target row
         for neighbor in self.get_row(row, omit_col=col):
             if val in neighbor.val:
@@ -398,23 +402,28 @@ class Sudoku:
 
         ns = NakedSingles(self)
         hs = HiddenSingles(self)
-        move_cnt = 0
+        move_count = 0
 
         while True:
             solved_count = self.get_solved_cell_count()
 
+            # naked singles first
             while ns.evaluate():
-                move_cnt += 1
+                move_count += 1
 
-            # TODO : hidden sinlges evalute gets stuck in infinite loop, not sure why right now
-            # while hs.evaluate():
-            #     move_cnt += 1
+            # next try hidden singles
+            move_count += hs.evaluate()
+
+            # TODO Naked Pairs.
+            # TODO Hidden Pairs.
+            # TODO Naked Triples.
+            # TODO Hidden Triples.
 
             # if no new cells were solved, exit
             if solved_count == self.get_solved_cell_count():
                 break
 
-        return move_cnt
+        return move_count
 
 
 

@@ -9,6 +9,7 @@ import csv
 import time
 import unittest
 
+from cell import Cell
 from hidden_singles import HiddenSingles
 from naked_singles import NakedSingles
 from sudoku import Sudoku
@@ -22,6 +23,18 @@ puzzle_1_easy = '''240 300 000
                 100 470 000 
                 302 051 000 
                 000 002 019'''
+
+puzzle_2_medium = '''020 004 000
+003 000 204
+140 080 503
+030 802 000
+200 000 006
+000 409 050
+402 070 081
+807 000 600
+000 600 070
+
+'''
 
 class TestSudoku(unittest.TestCase):
     """
@@ -113,20 +126,23 @@ Solved cells: 33 (41%)
         # ROW TEST: verify 4 removed from possible values for row 0
         row = 0
         # run remove_poss for value of 4 at 0,1, verify 4 removed from column 1
-        sudoku.remove_poss_value(4, row, 1)
+        cell = Cell(row, 1, 4)
+        sudoku.remove_poss_value(cell)
         # 4 should now be missing from possible values in column 1
         self.assertEqual(sudoku.board[row][2], [1, 2, 3, 5, 6, 7, 8, 9])
 
         # COL TEST: verify 5 removed from possible values for column 3
         col = 3
         # run remove_poss for value of 7 at row 3, col 3 (second subgroup of row 1)
-        sudoku.remove_poss_value(7, 3, col)
+        cell = Cell(3, col, 7)
+        sudoku.remove_poss_value(cell)
         # verify 7 removed from possible values for row 5, col 4 (same subgroup)
         self.assertEqual(sudoku.board[5][col], [1, 2, 3, 4, 5, 6, 8, 9])
 
         # SUBGROUP: remove 9 from bottom right subroup
         # run remove_poss_values for value of 9 at 8,8, verify 9 removed from col 7 in row 6
-        sudoku.remove_poss_value(9, 8, 8)
+        cell = Cell(8, 8, 9)
+        sudoku.remove_poss_value(cell)
         # 2 should now be missing from possible values
         self.assertEqual(sudoku.board[6][7], [1, 2, 3, 4, 5, 6, 7, 8])
 
@@ -147,15 +163,15 @@ Solved cells: 33 (41%)
         """
         Test hidden singles on easy puzzle
         """
-        sudoku = Sudoku(puzzle_1_easy)
+        sudoku = Sudoku(puzzle_2_medium)
         print('Before hidden singles:')
         sudoku.print()
         hs = HiddenSingles(sudoku)
-        count = hs.evaluate()
-        # TODO
+        # count = hs.evaluate()
+        count = sudoku.solve()              # NOTE: the current puzzle is unsolvable, just counting hidden singles moves
         print('After hidden singles:')
-        sudoku.print()
-        self.assertEqual(count, 384, "There are 384 naked single moves in easy 1 puzzle")
+        sudoku.print(simple=False)
+        self.assertEqual(count, 21, "There are 21 hidden single moves in easy 1 puzzle")
 
     def skip_test_solve_easy(self):
         '''
@@ -170,3 +186,6 @@ Solved cells: 33 (41%)
 
 if __name__ == '__main__':
     unittest.main()
+
+    from data_collection import SudokuDataCollection
+    SudokuDataCollection().test_all_puzzles()

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import unittest
 
+from cell import Cell
 from inference import InferenceRule
 
 class NakedSingles(InferenceRule):
@@ -22,9 +23,10 @@ class NakedSingles(InferenceRule):
             cell_changed = False  # this ensures a change is made every loop
             for row in range(9):
                 for col in range(9):
-                    cell = self.puzzle.board[row][col]
-                    if len(cell) == 1:
-                        changed = self.puzzle.remove_poss_value(cell[0], row, col)
+                    value = self.puzzle.board[row][col]
+                    if len(value) == 1:
+                        cell = Cell(row, col, value[0])
+                        changed = self.puzzle.remove_poss_value(cell)
                         if changed:
                             count += changed
                             cell_changed = True
