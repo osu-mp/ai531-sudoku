@@ -55,23 +55,49 @@ class SudokuDataCollection(unittest.TestCase):
         sudoku.print()
         # sudoku.solve()
 
+    def test_singles_only(self):
+        ''''
+        Test puzzle with naked single inference only
+        '''
+        sudoku = Sudoku(self.puzzles['1 Easy'])
+        print('start')
+        sudoku.print(simple=False)
+        #sudoku.init_constraints()
+        #print('after constraints initialized')
+
+        print('after constraints initialized')
+        ns = NakedSingles(sudoku)
+        ns.evaluate()
+        sudoku.print(simple=False)
+        sudoku.print()
+        self.assertTrue(sudoku.is_board_solved())
+
+    def run_single_test(self, puzzle_str, level):
+
+
     def test_all_puzzles(self):
         """
         Print out results for inference rules run against all puzzles
         """
         solved_count = 0
+        csv_header = 'puzzle name,given cells,'
+        # TODO: output data in csv
+        # TODO: we need a breakdown by number of moves in single, pair, triple
+        # for level in range(4):
+        #     csv_header += f'level {level} sovled cells,level {level} total moves,{level}'
         for puzzle in self.puzzles:
-            sudoku = Sudoku(self.puzzles[puzzle])
+            for level in range(4):
+                sudoku = Sudoku(self.puzzles[puzzle])
 
-            start_count = sudoku.get_solved_cell_count()
-            sudoku.solve()
-            end_count = sudoku.get_solved_cell_count()
+                start_count = sudoku.get_solved_cell_count()
+                sudoku.solve()
+                end_count = sudoku.get_solved_cell_count()
 
-            pct = 100 * end_count / 81
-            print(f'{puzzle:15s} {start_count:2d} {end_count:2d} {pct:2.0f}%')
+                pct = 100 * end_count / 81
+                print(f'{puzzle:15s} {start_count:2d} {end_count:2d} {pct:2.0f}%')
 
-            if end_count == 81:
-                solved_count += 1
+                if end_count == 81:
+                    solved_count += 1
 
         pct = 100 * solved_count / len(self.puzzles)
         print(f'Solved {solved_count} of {len(self.puzzles)} {pct:2.0f}%')

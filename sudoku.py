@@ -106,7 +106,11 @@ class Sudoku:
                 row += 1
 
     def is_board_solved(self):
-        raise Exception('TODO')
+        """
+        The board is solved when all cells are filled and all cells are valid
+        (1-9 in each row, col and region, no repeats)
+        """
+        return self.is_board_filled() and self.is_board_valid()
 
     def get_solved_cell_count(self):
         """
@@ -157,6 +161,8 @@ class Sudoku:
             cells = self.get_region(reg)
             if not self.is_cell_group_valid(cells):
                 raise Exception(f'Region invalid: {reg}')
+
+        return True
 
     def is_cell_group_valid(self, cells):
         """
@@ -386,6 +392,19 @@ class Sudoku:
 
         return count
 
+    def init_constraints(self):
+        """
+        After the board has been initialized, iterate through all solved cells
+        and update the constraints of related cells.
+        For example, if the cell at 0,1 is 4 that means that 4 can be removed from the domain
+        for all cells in row 0, all cells in column 1, and all cells in the first 3x3 region
+        """
+        for row in range(9):
+            for col in range(9):
+                value = self.board[row][col]
+                if len(value) == 1:                  # if number given
+                    self.solve_cell(Cell(row, col, value[0]))
+
     def is_row_valid(self, row):
         """
         Return True if the single values for each cell in the row are valid, else False
@@ -480,9 +499,15 @@ class Sudoku:
         # TODO get most constrained variable
         raise Exception('TODO Joe')
 
-    def solve(self):
+    def solve(self, level=0):
         """
         Try to solve this puzzle using inference rules
+        All inference rules are disabled by default
+        The 'level' param inputs translate to:
+            0 = no inference (default)
+            1 = singles only
+            2 = singles and pairs only
+            3 = singles, pairs, and triples
         """
 
         ns = NakedSingles(self)
@@ -492,15 +517,19 @@ class Sudoku:
         while True:
             solved_count = self.get_solved_cell_count()
 
-            # naked singles first
-            while ns.evaluate():
-                move_count += 1
+            if level >= 1:
+                # naked singles first
+                while ns.evaluate():
+                    move_count += 1
 
-            # next try hidden singles
-            move_count += hs.evaluate()
+                # next try hidden singles
+                move_count += hs.evaluate()
 
+            # if level >= 2:
             # TODO Naked Pairs.
             # TODO Hidden Pairs.
+
+            # if level >= 3:
             # TODO Naked Triples.
             # TODO Hidden Triples.
 
