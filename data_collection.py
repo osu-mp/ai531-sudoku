@@ -72,9 +72,13 @@ class SudokuDataCollection(unittest.TestCase):
         sudoku.print()
         self.assertTrue(sudoku.is_board_solved())
 
-    def run_single_test(self, puzzle_str, level):
-        # TODO
-        pass
+    def run_single_test(self, puzzle_name, level):
+        """
+        Run a single puzzle string through solver
+        This allows inference tests to access the already loaded puzzles directly
+        """
+        sudoku = Sudoku(self.puzzles[puzzle_name])
+        return sudoku.solve(level=level)
 
     def test_all_puzzles(self):
         """
@@ -82,7 +86,7 @@ class SudokuDataCollection(unittest.TestCase):
         """
         solved_count = 0
         csv_report = 'puzzle name,given cells,solved cells,solved delta,solved pct,' + \
-                     'naked singles,hidden singles,naked pairs,hidden triples,naked triples\n'
+                     'naked singles,hidden singles,naked pairs,hidden pairs,hidden triples,naked triples\n'
 
         for puzzle in self.puzzles:
             sudoku = Sudoku(self.puzzles[puzzle])
