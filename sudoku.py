@@ -56,18 +56,7 @@ Report your results in the form of a mini-paper as you did for the other two ass
 
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
-    sudoku_board = [
-        [0, 0, 2, 0, 9, 0, 6, 0, 0],
-        [6, 0, 9, 0, 0, 0, 0, 0, 0],
-        [4, 8, 0, 0, 0, 6, 0, 0, 0],
-        [0, 0, 8, 4, 0, 2, 0, 9, 0],
-        [3, 0, 0, 0, 0, 0, 0, 0, 7],
-        [0, 7, 0, 3, 0, 9, 1, 0, 0],
-        [0, 0, 0, 6, 0, 0, 0, 5, 1],
-        [0, 0, 0, 0, 0, 0, 2, 0, 4],
-        [0, 0, 7, 0, 8, 0, 3, 0, 0]
 
-    ]
 
 
     def __init__(self, puzzle_str):
@@ -192,7 +181,7 @@ class Sudoku:
             values.append(cell.val)
         return self.is_group_valid(values)
 
-    def print(self, simple=True, screen=True):
+    def print(self,board , simple=True, screen=True):
         """
         Print the current board
         If simple is True, this prints a 9x9 grid of single values (blanks for unsolved cells)
@@ -203,7 +192,7 @@ class Sudoku:
         solved = 0  # count number of solved cells
 
         if simple:
-            board = ""
+            
             for row in range(9):
                 for col in range(9):
                     cell = self.board[row][col]
@@ -474,6 +463,13 @@ class Sudoku:
 
         return True
    
+    # Prints board for backtracking
+    def printBoard(self, board):
+        for i in range(0, 9):
+            for j in range(0, 9):
+                print(board[i][j], end=" ")
+            print()
+    # Checks if the digit is valid in desired position
     def is_valid(self, digit, board, row, col):
         """
         Checks 3 is value is possible or not with 3 conditions:
@@ -503,12 +499,20 @@ class Sudoku:
         return True
 
     def solve_fixed_baseline_backtrack(self):
-        """
-        backtracking through possible values, cell by cell
-        """
-        # TODO not done yet
-        # NOTE: write tests in main.py (or other file)
-
+    # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
+    # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
+    # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
+        puzzle = [
+        [0, 0, 2, 0, 9, 0, 6, 0, 0],
+        [6, 0, 9, 0, 0, 0, 0, 0, 0],
+        [4, 8, 0, 0, 0, 6, 0, 0, 0],
+        [0, 0, 8, 4, 0, 2, 0, 9, 0],
+        [3, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 7, 0, 3, 0, 9, 1, 0, 0],
+        [0, 0, 0, 6, 0, 0, 0, 5, 1],
+        [0, 0, 0, 0, 0, 0, 2, 0, 4],
+        [0, 0, 7, 0, 8, 0, 3, 0, 0]
+        ]
         puzzle_2_medium = '''020 004 000
     003 000 204
     140 080 503
@@ -518,52 +522,18 @@ class Sudoku:
     402 070 081
     807 000 600
     000 600 070
-
     '''
-        puzzle =  self.build_board_from_str(puzzle_2_medium)
-        
-
-        for row in range(0,9):
-            for col in range(0,9):
-                # Check if the puzzle has restarted
+        # puzzle =  self.build_board_from_str(puzzle_2_medium)
+        for row in range(0, 9):
+            for col in range(0, 9):
                 if puzzle[row][col] == 0:
-                    digit = 1
-                    while digit <= 10:
+                    for digit in range(1, 10):
                         if self.is_valid(digit, puzzle, row, col):
                             puzzle[row][col] = digit
                             self.solve_fixed_baseline_backtrack()
                             puzzle[row][col] = 0
-                        digit+=1
-
-
-        self.print(puzzle)
-        '''
-        for row in range(start_row, 9):
-            for col in range(start_col, 9):
-                # if a cell has a single value, proceed to next
-                values = self.board[row][col]
-                if len(values) == 1:
-                    continue
-
-                while values:
-                    value = values.pop()
-                    self.board[row][col] = [value]
-                    if not self.is_row_valid(row):
-                        continue
-                    if not self.is_col_valid(col):
-                        continue
-                    if not self.is_subgroup_valid(row, col):
-                        continue
-
-                    if row == 8 and col == 8:
-                        return True
-                    return self.solve_brute_force_backtrack(row)
-                return False
-                # else, try every value
-                # TODO get recursion down
-                # if len(self.board[row][col]):
-        return True
-        '''
+                    return    
+        self.printBoard(puzzle)
 
 
     def solve_most_constrained_var(self):
