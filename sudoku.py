@@ -5,6 +5,7 @@
 # Joe Nguyen
 # Matthew Pacey
 
+from unicodedata import digit
 from cell import Cell
 from naked_singles import NakedSingles
 from hidden_singles import HiddenSingles
@@ -12,6 +13,7 @@ from naked_pairs import NakedPairs
 from hidden_pairs import HiddenPairs
 from naked_triples import NakedTriples
 from hidden_triples import HiddenTriples
+import math
 
 """
 Assignment Description
@@ -54,6 +56,19 @@ Report your results in the form of a mini-paper as you did for the other two ass
 
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
+    sudoku_board = [
+        [0, 0, 2, 0, 9, 0, 6, 0, 0],
+        [6, 0, 9, 0, 0, 0, 0, 0, 0],
+        [4, 8, 0, 0, 0, 6, 0, 0, 0],
+        [0, 0, 8, 4, 0, 2, 0, 9, 0],
+        [3, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 7, 0, 3, 0, 9, 1, 0, 0],
+        [0, 0, 0, 6, 0, 0, 0, 5, 1],
+        [0, 0, 0, 0, 0, 0, 2, 0, 4],
+        [0, 0, 7, 0, 8, 0, 3, 0, 0]
+
+    ]
+
 
     def __init__(self, puzzle_str):
         """
@@ -458,14 +473,70 @@ class Sudoku:
             used.append(value[0])       # otherwise add to used list
 
         return True
+   
+    def is_valid(self, digit, board, row, col):
+        """
+        Checks 3 is value is possible or not with 3 conditions:
+        1. Check repetation in column
+        2. Check repetation in row
+        3. Check repetation in 3x3 grid
 
-    def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
+        """
+        # Checks for repeated values in column
+        for col_counter in range(0,9):
+            if board[row][col_counter] == digit:
+                return False
+
+        # Checks for repeated values in row
+        for row_counter in range(0,9):
+            if board[row_counter][col] == digit:
+                return False
+
+        # Checks for repeated values in 3x3 grid
+        row_for_small_grid = math.floor(row / 3) * 3
+        col_for_small_grid = math.floor(col / 3) * 3
+        for miniRow in range(0,3):
+            for miniCol in range(0,3):
+                if board[row_for_small_grid + miniRow][col_for_small_grid + miniCol] == digit:
+                    return False
+
+        return True
+
+    def solve_fixed_baseline_backtrack(self):
         """
         backtracking through possible values, cell by cell
         """
         # TODO not done yet
         # NOTE: write tests in main.py (or other file)
-        raise Exception('TODO: Wadood')
+
+        puzzle_2_medium = '''020 004 000
+    003 000 204
+    140 080 503
+    030 802 000
+    200 000 006
+    000 409 050
+    402 070 081
+    807 000 600
+    000 600 070
+
+    '''
+        puzzle =  self.build_board_from_str(puzzle_2_medium)
+        
+
+        for row in range(0,9):
+            for col in range(0,9):
+                # Check if the puzzle has restarted
+                if puzzle[row][col] == 0:
+                    digit = 1
+                    while digit <= 10:
+                        if self.is_valid(digit, puzzle, row, col):
+                            puzzle[row][col] = digit
+                            self.solve_fixed_baseline_backtrack()
+                            puzzle[row][col] = 0
+                        digit+=1
+
+
+        self.print(puzzle)
         '''
         for row in range(start_row, 9):
             for col in range(start_col, 9):
