@@ -18,7 +18,6 @@ class HiddenSingles(InferenceRule):
         See link above for example.
         """
 
-        count = 0
         cell_changed = True  # run init at least once
         while cell_changed:  # keep running when a change is made
             cell_changed = False  # this ensures a change is made every loop
@@ -37,7 +36,7 @@ class HiddenSingles(InferenceRule):
                         # TODO figure out why bottom row gets into bad state for 10 medium
                         raise
                     changed = self.puzzle.solve_cell(match)
-                    count += changed
+                    self.move_count += 1
                     cell_changed = True
                     self.puzzle.is_board_valid()
 
@@ -63,8 +62,6 @@ class HiddenSingles(InferenceRule):
             #         count += changed
             #         cell_changed = True
             #         self.puzzle.is_board_valid()
-
-        return count
 
     @staticmethod
     def evaluate_group(cells):

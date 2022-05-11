@@ -19,7 +19,6 @@ class NakedPairs(InferenceRule):
         Doing so, leaves two 3,8 pairs. The 3,4,6, and 8 quads are really “hidden pairs”. More Sudoku tips on this.
         See link above for example.
         """
-        count = 0
         cell_changed = True  # run init at least once
         while cell_changed:  # keep running when a change is made
             cell_changed = False  # this ensures a change is made every loop
@@ -31,7 +30,7 @@ class NakedPairs(InferenceRule):
             # TODO once the pairs are identified, remove the paired values from all other cells in the group
             # i.e. for unit test below, 4 and 6 would be removed from all but cell 0,0 and cell 0,2
 
-        return count
+            # TODO self.move_count += 1
 
     @staticmethod
     def evaluate_group(cells):

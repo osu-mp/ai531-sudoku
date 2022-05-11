@@ -17,7 +17,7 @@ class NakedSingles(InferenceRule):
         then that candidate is the solution for that cell.
         See link above for example.
         """
-        count = 0
+
         cell_changed = True  # run init at least once
         while cell_changed:  # keep running when a change is made
             cell_changed = False  # this ensures a change is made every loop
@@ -28,8 +28,5 @@ class NakedSingles(InferenceRule):
                         cell = Cell(row, col, value[0])
                         changed = self.puzzle.solve_cell(cell)
                         if changed:
-                            count += changed
+                            self.move_count += 1
                             cell_changed = True
-
-        return count
-

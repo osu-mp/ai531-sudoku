@@ -10,6 +10,7 @@ class InferenceRule(ABC):
     """
     def __init__(self, puzzle):
         self.puzzle = puzzle
+        self.move_count = 0
 
     @abstractmethod
     def evaluate(self):
@@ -18,6 +19,7 @@ class InferenceRule(ABC):
         If found:
             update inferred cell with value
             remove inferred value from possible values in row, col and subgroup
-        return count of cells changed
+
+        NOTE: Make sure to update self.move_count every time a cell is updated
         """
         pass
