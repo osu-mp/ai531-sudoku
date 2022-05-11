@@ -72,19 +72,23 @@ class HiddenSingles(InferenceRule):
         # if only one cell, that is a hidden single
         # key = number (1-9), value = list of cells where it could be
         poss_cells = {}
+        set_vals = []                   # values that are already set (ignore these as hidden singles)
         for cell in cells:
             # ignore cells with values set
             if len(cell.val) == 1:
-                continue
-            for val in cell.val:
-                if val in poss_cells:
-                    poss_cells[val].append((cell.row, cell.col))
-                else:
-                    poss_cells[val] = [(cell.row, cell.col)]
+                set_vals.append(cell.val[0])
+            else:
+                for val in cell.val:
+                    if val in poss_cells:
+                        poss_cells[val].append((cell.row, cell.col))
+                    else:
+                        poss_cells[val] = [(cell.row, cell.col)]
 
         # if any values in poss_cells have a single value, that is a hidden single
         hidden_singles = []
         for value in poss_cells:
+            if value in set_vals:                       # if a value has already been set in a cell, ignore
+                continue
             if len(poss_cells[value]) == 1:
                 row, col = poss_cells[value][0]
                 hidden_singles.append(Cell(row, col, value))
@@ -110,6 +114,27 @@ class TestHiddenSingles(unittest.TestCase):
             Cell(0, 2, 7),
             Cell(0, 8, 4)
         ]
+
+        actual_hidden = HiddenSingles.evaluate_group(cells)
+        self.assertEqual(expected_hidden, actual_hidden)
+
+    def test_evaluate_group_10_medium(self):
+        """
+        This was a failing case before set_vals was introduced (produced a match where there was none)
+        """
+        cells = [
+            Cell(0, 0, [1, 2, 7]),
+            Cell(0, 1, [8]),
+            Cell(0, 2, [9]),
+            Cell(0, 3, [1, 5]),
+            Cell(0, 4, [5]),
+            Cell(0, 5, [3]),
+            Cell(0, 6, [2, 7]),
+            Cell(0, 7, [4]),
+            Cell(0, 8, [4])
+        ]
+
+        expected_hidden = []
 
         actual_hidden = HiddenSingles.evaluate_group(cells)
         self.assertEqual(expected_hidden, actual_hidden)

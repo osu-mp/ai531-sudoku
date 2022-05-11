@@ -528,7 +528,7 @@ class Sudoku:
                 ns.evaluate()
 
                 # next try hidden singles
-                # hs.evaluate()
+                hs.evaluate()
 
             if level >= 2:
                 # next try pairs
