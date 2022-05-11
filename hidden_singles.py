@@ -30,38 +30,33 @@ class HiddenSingles(InferenceRule):
                 # self.puzzle.print(simple=False)
                 for match in matches:
                     # print(f'Operating on match: {match}')
-                    try:
-                        self.puzzle.board[match.row][match.col] = [match.val]
-                    except:
-                        # TODO figure out why bottom row gets into bad state for 10 medium
-                        raise
+                    self.puzzle.board[match.row][match.col] = [match.val]
                     changed = self.puzzle.solve_cell(match)
                     self.move_count += 1
                     cell_changed = True
                     self.puzzle.is_board_valid()
 
-            # TODO : col check is leading to invalid rows, not sure why
             # # check cols
-            # for col in range(9):
-            #     cells = self.puzzle.get_col(col)
-            #     matches = self.evaluate_group(cells)
-            #     for match in matches:
-            #         self.puzzle.board[match.row][match.col] = [match.val]
-            #         changed = self.puzzle.remove_poss_value(match)
-            #         count += changed
-            #         cell_changed = True
-            #         self.puzzle.is_board_valid()
+            for col in range(9):
+                cells = self.puzzle.get_col(col)
+                matches = self.evaluate_group(cells)
+                for match in matches:
+                    self.puzzle.board[match.row][match.col] = [match.val]
+                    changed = self.puzzle.solve_cell(match)
+                    self.move_count += 1
+                    cell_changed = True
+                    self.puzzle.is_board_valid()
 
-            # # check groups
-            # for n in range(9):
-            #     cells = self.puzzle.get_region(n)
-            #     matches = self.evaluate_group(cells)
-            #     for match in matches:
-            #         self.puzzle.board[match.row][match.col] = [match.val]
-            #         changed = self.puzzle.remove_poss_value(match)
-            #         count += changed
-            #         cell_changed = True
-            #         self.puzzle.is_board_valid()
+            # # check regions
+            for n in range(9):
+                cells = self.puzzle.get_region(n)
+                matches = self.evaluate_group(cells)
+                for match in matches:
+                    self.puzzle.board[match.row][match.col] = [match.val]
+                    changed = self.puzzle.solve_cell(match)
+                    self.move_count += 1
+                    cell_changed = True
+                    self.puzzle.is_board_valid()
 
     @staticmethod
     def evaluate_group(cells):

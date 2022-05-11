@@ -74,7 +74,7 @@ Wadood hidden pairs
 Joe naked triples
 Joe hidden triples
 Joe Backtracking for MCV (solve_most_constrained_var))
-Matthew ability to tell solve which inference rules to include/exclude
+[DONE] Matthew ability to tell solve which inference rules to include/exclude
 breakout condition - 1000
 timer/data collection for solve (using previous line)
 
