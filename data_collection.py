@@ -73,7 +73,8 @@ class SudokuDataCollection(unittest.TestCase):
         self.assertTrue(sudoku.is_board_solved())
 
     def run_single_test(self, puzzle_str, level):
-
+        # TODO 
+        pass
 
     def test_all_puzzles(self):
         """
