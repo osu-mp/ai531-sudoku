@@ -16,7 +16,6 @@ class HiddenPairs(InferenceRule):
         It is safe to remove all other digits from the two cells circled in red so that only the two and nine remain.
         Hidden pairs will appear often in your Sudoku puzzles and games.See link above for example.
         """
-        count = 0
         cell_changed = True  # run init at least once
         while cell_changed:  # keep running when a change is made
             cell_changed = False  # this ensures a change is made every loop
@@ -28,7 +27,7 @@ class HiddenPairs(InferenceRule):
             # TODO once the pairs are identified, remove the paired values from all other cells in the group
             # i.e. for unit test below, 2 and 9 would be removed from all but cell 0,0 and cell 0,2
 
-        return count
+            # TODO self.move_count += 1
 
     @staticmethod
     def evaluate_group(cells):

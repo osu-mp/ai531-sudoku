@@ -23,7 +23,6 @@ class NakedTriples(InferenceRule):
         and a hidden single (2). See how these Sudoku tips help you solve puzzles?
         See link above for example.
         """
-        count = 0
         cell_changed = True  # run init at least once
         while cell_changed:  # keep running when a change is made
             cell_changed = False  # this ensures a change is made every loop
@@ -34,7 +33,7 @@ class NakedTriples(InferenceRule):
 
             # TODO once the triples are identified, remove the triple values from all other cells in the group
 
-        return count
+            # TODO self.move_count += 1
 
     @staticmethod
     def evaluate_group(cells):

@@ -30,7 +30,8 @@ class HiddenTriples(InferenceRule):
             # TODO once the triples are identified, triples the paired values from all other cells in the group
             # i.e. for unit test below, 4, 8, and 9 would be removed from all but cell 0,2 and cell 0,4 and 0,5
 
-        return count
+            # TODO self.move_count += 1
+
 
     @staticmethod
     def evaluate_group(cells):

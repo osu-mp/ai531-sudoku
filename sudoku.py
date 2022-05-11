@@ -6,9 +6,12 @@
 # Matthew Pacey
 
 from cell import Cell
-from hidden_singles import HiddenSingles
 from naked_singles import NakedSingles
-
+from hidden_singles import HiddenSingles
+from naked_pairs import NakedPairs
+from hidden_pairs import HiddenPairs
+from naked_triples import NakedTriples
+from hidden_triples import HiddenTriples
 
 """
 Assignment Description
@@ -512,32 +515,36 @@ class Sudoku:
 
         ns = NakedSingles(self)
         hs = HiddenSingles(self)
-        move_count = 0
+        np = NakedPairs(self)
+        hp = HiddenPairs(self)
+        nt = NakedTriples(self)
+        ht = HiddenTriples(self)
 
         while True:
             solved_count = self.get_solved_cell_count()
 
             if level >= 1:
                 # naked singles first
-                while ns.evaluate():
-                    move_count += 1
+                ns.evaluate()
 
                 # next try hidden singles
-                move_count += hs.evaluate()
+                hs.evaluate()
 
-            # if level >= 2:
-            # TODO Naked Pairs.
-            # TODO Hidden Pairs.
+            if level >= 2:
+                # next try pairs
+                np.evaluate()
+                hp.evaluate()
 
-            # if level >= 3:
-            # TODO Naked Triples.
-            # TODO Hidden Triples.
+            if level >= 3:
+                # next try triples
+                nt.evaluate()
+                ht.evaluate()
 
             # if no new cells were solved, exit
             if solved_count == self.get_solved_cell_count():
                 break
 
-        return move_count
+        return (ns.move_count, hs.move_count, np.move_count, hp.move_count, nt.move_count, ht.move_count)
 
 
 
