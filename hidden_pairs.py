@@ -96,7 +96,7 @@ class HiddenPairs(InferenceRule):
         if not matches:
             return False
 
-        cell0 = matches[0]              # local var for readabliity (no extra brackets)
+        cell0 = matches[0]              # local var for readability (no extra brackets)
         cell1 = matches[1]
         if self.puzzle.board[cell0.row][cell0.col] == self.puzzle.board[cell1.row][cell1.col]:      # the cells already only contain the two numbers, nothing to do
             return False
@@ -114,7 +114,7 @@ class HiddenPairs(InferenceRule):
         # print(f'After before')
         # self.puzzle.print(simple=False)
 
-        return True                     # let caller we took an action
+        return True                     # let caller know we took an action
 
 
 class TestHiddenPairs(unittest.TestCase):
@@ -175,9 +175,9 @@ class TestHiddenPairs(unittest.TestCase):
         from data_collection import SudokuDataCollection
         dc = SudokuDataCollection()
         dc.load_puzzles()
-        (ns, hs, np, hp, nt, ht) = dc.run_single_test('12 Hard', 2)
+        (ns, hs, np, hp, nt, ht) = dc.run_single_test('60 Evil', 2)
 
-        self.assertEqual(1, hp, 'This puzzle contains 1 known hidden pairs at start')
+        self.assertEqual(1, hp, 'This puzzle contains 1 known hidden pair at start')
 
 
 if __name__ == '__main__':
