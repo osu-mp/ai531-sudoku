@@ -7,17 +7,17 @@ from sudoku import Sudoku
 
 from queue import PriorityQueue
 
-q = PriorityQueue()
-
-q.put((4, 'Read'))
-q.put((2, 'Play'))
-q.put((5, 'Write'))
-q.put((1, 'Code'))
-q.put((3, 'Study'))
-
-while not q.empty():
-    next_item = q.get()
-    print(next_item)
+# q = PriorityQueue()
+#
+# q.put((4, 'Read'))
+# q.put((2, 'Play'))
+# q.put((5, 'Write'))
+# q.put((1, 'Code'))
+# q.put((3, 'Study'))
+#
+# while not q.empty():
+#     next_item = q.get()
+#     print(next_item)
 
 
 def get_sorted_constrained_vars(sudoku: Sudoku):
@@ -81,8 +81,8 @@ def solve_most_constrained_var(sudoku: Sudoku, history: List):
 
     queue_cells = get_sorted_constrained_vars(sudoku)
     if len(queue_cells) == 0:
-        print('solved')
-        sudoku.print()
+        # print('solved')
+        # sudoku.print()
         return sudoku
 
     for q_item in queue_cells:
@@ -91,18 +91,21 @@ def solve_most_constrained_var(sudoku: Sudoku, history: List):
 
         for val in possible_values:
             if is_valid_cell_value(val, sudoku.board, i, j):
-                print(f'BT {i}, {j}, val = {val}')
+                # print(f'BT {i}, {j}, val = {val}')
                 new_sudoku = copy.deepcopy(sudoku)
                 new_sudoku.board[i][j] = [val]
-
                 # update val of all other cells
-                new_sudoku.solve_cell(Cell(i, j, val))
-                possible_sudoku = solve_most_constrained_var(new_sudoku, history + [((i, j), val)])
+                try:
+                    new_sudoku.solve_cell(Cell(i, j, val))
+                except Exception as e:
+                    # print('Error = ', e)
+                    continue
 
+                possible_sudoku = solve_most_constrained_var(new_sudoku, history + [((i, j), val)])
                 if possible_sudoku != -1:
                     return possible_sudoku
 
-        print(f'out of values for {i}, {j}')
+        # print(f'out of values for {i}, {j}')
         return -1
 
     return -1
@@ -121,4 +124,7 @@ if __name__ == '__main__':
     000 600 070
     '''
     sudoku = Sudoku(puzzle_2_medium)
-    print(solve_most_constrained_var(sudoku, []))
+    solved_sudoku = solve_most_constrained_var(sudoku, [])
+    assert solved_sudoku.is_board_solved()
+    solved_sudoku.print()
+
