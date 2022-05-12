@@ -4,6 +4,7 @@
 # Wadood Alam
 # Joe Nguyen
 # Matthew Pacey
+from typing import Dict, List
 
 from cell import Cell
 from naked_singles import NakedSingles
@@ -65,7 +66,7 @@ class Sudoku:
             The inference rules will reduce this list as they execute
             If values has only one number, that is the final value
         """
-        self.board = []
+        self.board = [] # type: Dict[int, Dict[int, List]]
         self.build_board_from_str(puzzle_str)
 
     def build_board_from_str(self, puzzle_str):
@@ -190,6 +191,7 @@ class Sudoku:
         if simple:
             board = ""
             for row in range(9):
+                # board += '(' + str(row) + ') '
                 for col in range(9):
                     cell = self.board[row][col]
                     if len(cell) == 1:
@@ -210,6 +212,7 @@ class Sudoku:
             # the big board is 9 cells by 3 rows/cols in each cell -> 27x27 grid
             bigBoard = [['_' for col in range(27)] for row in range(27)]
             for row in range(9):
+
                 for col in range(9):
                     cell = self.board[row][col]
                     if len(cell) == 1:
@@ -237,6 +240,7 @@ class Sudoku:
             rowCount = 0
             colCount = 0
             for row in bigBoard:
+                # board += '(' + str(row) + ') '
                 for col in row:
                     board += col
                     colCount += 1
@@ -350,7 +354,7 @@ class Sudoku:
         for neighbor in self.get_row(row, omit_col=col):
             if val in neighbor.val:
                 self.board[row][neighbor.col].remove(val)
-                # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
+                # print('Removed ROW possible value of %d at %d,%d' % (val, row, neighbor.col))
                 count += 1
 
                 # TODO : if the updated cell only has one value, update its neighbors
@@ -366,7 +370,7 @@ class Sudoku:
         for neighbor in self.get_col(col, omit_row=row):
             if val in neighbor.val:
                 self.board[neighbor.row][col].remove(val)
-                # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
+                # print('Removed COL possible value of %d at %d,%d' % (val, neighbor.row, col))
                 count += 1
 
                 # TODO : if the updated cell only has one value, update its neighbors
@@ -382,6 +386,7 @@ class Sudoku:
         for neighbor in self.get_group(row, col, omit_cell=True):
             if val in self.board[neighbor.row][neighbor.col]:
                 self.board[neighbor.row][neighbor.col].remove(val)
+                # print('Removed GROUP possible value of %d at %d,%d' % (val, neighbor.row, neighbor.col))
                 count += 1
 
                 # TODO : if the updated cell only has one value, update its neighbors
@@ -497,10 +502,13 @@ class Sudoku:
 
     def solve_most_constrained_var(self):
         """
-
+        Most Constrained Variable: Pick a slot that has the least number of values in its domain.
         """
         # TODO get most constrained variable
         raise Exception('TODO Joe')
+
+
+
 
     def solve(self, level=0):
         """

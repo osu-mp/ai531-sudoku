@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+from typing import List, Literal
+
 
 class Cell:
     """
@@ -7,7 +9,7 @@ class Cell:
     If val is a list of length one, that cell's value is that single number
     Else, the cell can be any of the values in val
     """
-    def __init__(self, row, col, val):
+    def __init__(self, row: int, col: int, val: Literal[List, int]):
         self.row = row
         self.col = col
         self.val = val
@@ -23,3 +25,6 @@ class Cell:
         Print cell
         """
         return(f'Cell: {self.row},{self.col} = {self.val}')
+
+    def __repr__(self):
+        return self.__str__()
