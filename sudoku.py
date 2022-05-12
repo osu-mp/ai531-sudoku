@@ -528,7 +528,7 @@ class Sudoku:
                              )
         return bt_puzzle
 
-    def solve_fixed_baseline_backtrack(self):
+    def solve_fixed_baseline_backtrack(self, bt_count):
     # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
     # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
     # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
@@ -561,8 +561,10 @@ class Sudoku:
                         if self.is_valid(digit, puzzle, row, col):
                             puzzle[row][col] = digit
                             self.solve_fixed_baseline_backtrack()
+                            bt_count = bt_count + 1
                             puzzle[row][col] = 0
-                    return    
+                    return   
+        print(bt_count)            
         self.printBoard(puzzle)
 
 

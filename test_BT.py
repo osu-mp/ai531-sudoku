@@ -11,6 +11,19 @@ puzzle = [
 [0, 0, 7, 0, 8, 0, 3, 0, 0]
 
 ]
+"""
+puzzle =    [
+[8, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 3, 6, 0, 0, 0, 0, 0],
+[0, 7, 0, 0, 9, 0, 2, 0, 0],
+[0, 5, 0, 0, 0, 7, 0, 0, 0],
+[0, 0, 0, 0, 4, 5, 7, 0, 0],
+[0, 0, 0, 1, 0, 0, 0, 3, 0],
+[0, 0, 1, 0, 0, 0, 0, 6, 8],
+[0, 0, 8, 5, 0, 0, 0, 1, 0],
+[0, 9, 0, 0, 0, 0, 4, 0, 0]
+]
+"""
 import math
 
 
@@ -50,9 +63,8 @@ def is_valid(digit, board, row, col):
     return True
 
 
-
-
-def solve_fixed_baseline_backtrack():
+def solve_fixed_baseline_backtrack(bt_count):
+    
     for row in range(0, 9):
         for col in range(0, 9):
             if puzzle[row][col] == 0:
@@ -60,10 +72,15 @@ def solve_fixed_baseline_backtrack():
                 for digit in range(1, 10):
                     if is_valid(digit, puzzle, row, col):
                         puzzle[row][col] = digit
-                        solve_fixed_baseline_backtrack()
+                        solve_fixed_baseline_backtrack(bt_count)
+                        bt_count = bt_count + 1
                         puzzle[row][col] = 0
-                return     
+                    
+                return 
+    print(bt_count)             
+    printBoard(puzzle)               
+    
+    
+    
 
-    printBoard(puzzle)
-
-solve_fixed_baseline_backtrack()
+ans = solve_fixed_baseline_backtrack(0)
