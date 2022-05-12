@@ -4,7 +4,7 @@
 # Wadood Alam
 # Joe Nguyen
 # Matthew Pacey
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 from cell import Cell
 from naked_singles import NakedSingles
@@ -68,6 +68,7 @@ class Sudoku:
         """
         self.board = [] # type: Dict[int, Dict[int, List]]
         self.build_board_from_str(puzzle_str)
+        self.init_constraints()
 
     def build_board_from_str(self, puzzle_str):
         """
@@ -151,7 +152,7 @@ class Sudoku:
         for row in range(9):
             cells = self.get_row(row)
             if not self.is_cell_group_valid(cells):
-                self.print()
+                # self.print()
                 raise Exception(f'Row invalid: {row}')
 
         # check all cols
@@ -503,10 +504,9 @@ class Sudoku:
     def solve_most_constrained_var(self):
         """
         Most Constrained Variable: Pick a slot that has the least number of values in its domain.
+        @rtype: -1 or Sudoku
         """
         # TODO get most constrained variable
-        raise Exception('TODO Joe')
-
 
 
 
