@@ -498,6 +498,36 @@ class Sudoku:
 
         return True
 
+    def get_bt_puzzle(self):
+        """
+        Return the current puzzle in the form that solve_fixed_baseline_backtrack expects
+        BT expects a 2D array like this:
+        [
+            [0, 0, 2, 0, 9, 0, 6, 0, 0],
+            [6, 0, 9, 0, 0, 0, 0, 0, 0],
+            [4, 8, 0, 0, 0, 6, 0, 0, 0],
+            [0, 0, 8, 4, 0, 2, 0, 9, 0],
+            [3, 0, 0, 0, 0, 0, 0, 0, 7],
+            [0, 7, 0, 3, 0, 9, 1, 0, 0],
+            [0, 0, 0, 6, 0, 0, 0, 5, 1],
+            [0, 0, 0, 0, 0, 0, 2, 0, 4],
+            [0, 0, 7, 0, 8, 0, 3, 0, 0]
+        ]
+        So convert the self.board 3D list into a 2D list and put a 0 in cells that do not have a single value
+        """
+        bt_puzzle = []
+        for row in range(9):
+            this_row = []
+            for col in range(9):
+                cell_value = self.board[row][col]
+                if len(cell_value) == 1:
+                    this_row.append(cell_value[0])
+                else:
+                    this_row.append(0)
+            bt_puzzle.append(this_row
+                             )
+        return bt_puzzle
+
     def solve_fixed_baseline_backtrack(self):
     # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
     # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
