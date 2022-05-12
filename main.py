@@ -5,8 +5,6 @@
 # Joe Nguyen
 # Matthew Pacey
 
-import csv
-import time
 import unittest
 
 from cell import Cell
@@ -35,6 +33,16 @@ puzzle_2_medium = '''020 004 000
 000 600 070
 
 '''
+
+puzzle_3_hard = '''170 000 006
+006 090 040
+300 070 000
+000 900 030
+094 020 870
+030 005 000
+000 060 001
+080 010 500
+500 000 082'''
 
 class TestSudoku(unittest.TestCase):
     """
@@ -151,27 +159,16 @@ Solved cells: 33 (41%)
         Test naked singles on easy puzzle
         """
         sudoku = Sudoku(puzzle_1_easy)
-        print('Before naked singles:')
-        sudoku.print()
-        ns = NakedSingles(sudoku)
-        count = ns.evaluate()
-        print('After naked singles:')
-        sudoku.print()
-        self.assertEqual(count, 384, "There are 384 naked single moves in easy 1 puzzle")
+        (ns, hs, np, hp, nt, ht) = sudoku.solve(level=1)
+        self.assertEqual(ns, 66, "There are 66 naked singles in easy 1 puzzle")
 
     def test_hidden_singles(self):
         """
         Test hidden singles on easy puzzle
         """
-        sudoku = Sudoku(puzzle_2_medium)
-        print('Before hidden singles:')
-        sudoku.print()
-        hs = HiddenSingles(sudoku)
-        # count = hs.evaluate()
-        count = sudoku.solve()              # NOTE: the current puzzle is unsolvable, just counting hidden singles moves
-        print('After hidden singles:')
-        sudoku.print(simple=False)
-        self.assertEqual(count, 21, "There are 21 hidden single moves in easy 1 puzzle")
+        sudoku = Sudoku(puzzle_3_hard)
+        (ns, hs, np, hp, nt, ht) = sudoku.solve(level=1)
+        self.assertEqual(hs, 12, "There are 12 hidden singles in the 3 Hard puzzle")
 
     def skip_test_solve_easy(self):
         '''
