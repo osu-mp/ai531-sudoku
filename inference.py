@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 
 from abc import ABC, abstractmethod
+# import sudoku.Sudoku
+
+# from sudoku import Sudoku
 
 
 class InferenceRule(ABC):
@@ -8,6 +11,7 @@ class InferenceRule(ABC):
     Generic parent class for sudoku inference rules
 
     """
+    # from sudoku import Sudoku
     def __init__(self, puzzle):
         self.puzzle = puzzle
         self.move_count = 0
