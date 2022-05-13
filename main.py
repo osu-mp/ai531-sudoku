@@ -181,6 +181,38 @@ Solved cells: 33 (41%)
         sudoku.print()
         # sudoku.solve()
 
+    def test_get_bt_puzzle(self):
+        """
+        Unit test for get_bt_puzzle
+        Convert the puzzle 3d array into a 2d array for the backtracking algo
+        """
+        puzzle_str = '''
+        002 090 600
+        609 000 000
+        480 006 000
+        008 402 090
+        300 000 007
+        070 309 100
+        000 600 051
+        000 000 204
+        007 080 300
+        '''
+        sudoku = Sudoku(puzzle_str)
+
+        expected = [
+            [0, 0, 2, 0, 9, 0, 6, 0, 0],
+            [6, 0, 9, 0, 0, 0, 0, 0, 0],
+            [4, 8, 0, 0, 0, 6, 0, 0, 0],
+            [0, 0, 8, 4, 0, 2, 0, 9, 0],
+            [3, 0, 0, 0, 0, 0, 0, 0, 7],
+            [0, 7, 0, 3, 0, 9, 1, 0, 0],
+            [0, 0, 0, 6, 0, 0, 0, 5, 1],
+            [0, 0, 0, 0, 0, 0, 2, 0, 4],
+            [0, 0, 7, 0, 8, 0, 3, 0, 0]
+        ]
+        actual = sudoku.get_bt_puzzle()
+        self.assertEqual(expected, actual)
+
 if __name__ == '__main__':
     unittest.main()
 

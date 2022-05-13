@@ -5,6 +5,7 @@
 # Joe Nguyen
 # Matthew Pacey
 
+from unicodedata import digit
 from cell import Cell
 from naked_singles import NakedSingles
 from hidden_singles import HiddenSingles
@@ -12,6 +13,7 @@ from naked_pairs import NakedPairs
 from hidden_pairs import HiddenPairs
 from naked_triples import NakedTriples
 from hidden_triples import HiddenTriples
+import math
 
 """
 Assignment Description
@@ -186,9 +188,10 @@ class Sudoku:
         :return:
         """
         solved = 0  # count number of solved cells
+        board = ""
 
         if simple:
-            board = ""
+            
             for row in range(9):
                 for col in range(9):
                     cell = self.board[row][col]
@@ -458,41 +461,110 @@ class Sudoku:
             used.append(value[0])       # otherwise add to used list
 
         return True
-
-    def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
+   
+    # Prints board for backtracking
+    def printBoard(self, board):
+        for i in range(0, 9):
+            for j in range(0, 9):
+                print(board[i][j], end=" ")
+            print()
+    # Checks if the digit is valid in desired position
+    def is_valid(self, digit, board, row, col):
         """
-        backtracking through possible values, cell by cell
+        Checks 3 is value is possible or not with 3 conditions:
+        1. Check repetation in column
+        2. Check repetation in row
+        3. Check repetation in 3x3 grid
+
         """
-        # TODO not done yet
-        # NOTE: write tests in main.py (or other file)
-        raise Exception('TODO: Wadood')
-        '''
-        for row in range(start_row, 9):
-            for col in range(start_col, 9):
-                # if a cell has a single value, proceed to next
-                values = self.board[row][col]
-                if len(values) == 1:
-                    continue
-
-                while values:
-                    value = values.pop()
-                    self.board[row][col] = [value]
-                    if not self.is_row_valid(row):
-                        continue
-                    if not self.is_col_valid(col):
-                        continue
-                    if not self.is_subgroup_valid(row, col):
-                        continue
-
-                    if row == 8 and col == 8:
-                        return True
-                    return self.solve_brute_force_backtrack(row)
+        # Checks for repeated values in column
+        for col_counter in range(0,9):
+            if board[row][col_counter] == digit:
                 return False
-                # else, try every value
-                # TODO get recursion down
-                # if len(self.board[row][col]):
+
+        # Checks for repeated values in row
+        for row_counter in range(0,9):
+            if board[row_counter][col] == digit:
+                return False
+
+        # Checks for repeated values in 3x3 grid
+        row_for_small_grid = math.floor(row / 3) * 3
+        col_for_small_grid = math.floor(col / 3) * 3
+        for miniRow in range(0,3):
+            for miniCol in range(0,3):
+                if board[row_for_small_grid + miniRow][col_for_small_grid + miniCol] == digit:
+                    return False
+
         return True
-        '''
+
+    def get_bt_puzzle(self):
+        """
+        Return the current puzzle in the form that solve_fixed_baseline_backtrack expects
+        BT expects a 2D array like this:
+        [
+            [0, 0, 2, 0, 9, 0, 6, 0, 0],
+            [6, 0, 9, 0, 0, 0, 0, 0, 0],
+            [4, 8, 0, 0, 0, 6, 0, 0, 0],
+            [0, 0, 8, 4, 0, 2, 0, 9, 0],
+            [3, 0, 0, 0, 0, 0, 0, 0, 7],
+            [0, 7, 0, 3, 0, 9, 1, 0, 0],
+            [0, 0, 0, 6, 0, 0, 0, 5, 1],
+            [0, 0, 0, 0, 0, 0, 2, 0, 4],
+            [0, 0, 7, 0, 8, 0, 3, 0, 0]
+        ]
+        So convert the self.board 3D list into a 2D list and put a 0 in cells that do not have a single value
+        """
+        bt_puzzle = []
+        for row in range(9):
+            this_row = []
+            for col in range(9):
+                cell_value = self.board[row][col]
+                if len(cell_value) == 1:
+                    this_row.append(cell_value[0])
+                else:
+                    this_row.append(0)
+            bt_puzzle.append(this_row
+                             )
+        return bt_puzzle
+
+    def solve_fixed_baseline_backtrack(self, bt_count):
+    # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
+    # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
+    # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
+        puzzle = [
+        [0, 0, 2, 0, 9, 0, 6, 0, 0],
+        [6, 0, 9, 0, 0, 0, 0, 0, 0],
+        [4, 8, 0, 0, 0, 6, 0, 0, 0],
+        [0, 0, 8, 4, 0, 2, 0, 9, 0],
+        [3, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 7, 0, 3, 0, 9, 1, 0, 0],
+        [0, 0, 0, 6, 0, 0, 0, 5, 1],
+        [0, 0, 0, 0, 0, 0, 2, 0, 4],
+        [0, 0, 7, 0, 8, 0, 3, 0, 0]
+        ]
+        puzzle_2_medium = '''020 004 000
+    003 000 204
+    140 080 503
+    030 802 000
+    200 000 006
+    000 409 050
+    402 070 081
+    807 000 600
+    000 600 070
+    '''
+        # puzzle =  self.build_board_from_str(puzzle_2_medium)
+        for row in range(0, 9):
+            for col in range(0, 9):
+                if puzzle[row][col] == 0:
+                    for digit in range(1, 10):
+                        if self.is_valid(digit, puzzle, row, col):
+                            puzzle[row][col] = digit
+                            self.solve_fixed_baseline_backtrack()
+                            bt_count = bt_count + 1
+                            puzzle[row][col] = 0
+                    return   
+        print(bt_count)            
+        self.printBoard(puzzle)
 
 
     def solve_most_constrained_var(self):
