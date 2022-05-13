@@ -548,17 +548,6 @@ class Sudoku:
     # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
     # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
     # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
-    #     puzzle = [
-    #     [0, 0, 2, 0, 9, 0, 6, 0, 0],
-    #     [6, 0, 9, 0, 0, 0, 0, 0, 0],
-    #     [4, 8, 0, 0, 0, 6, 0, 0, 0],
-    #     [0, 0, 8, 4, 0, 2, 0, 9, 0],
-    #     [3, 0, 0, 0, 0, 0, 0, 0, 7],
-    #     [0, 7, 0, 3, 0, 9, 1, 0, 0],
-    #     [0, 0, 0, 6, 0, 0, 0, 5, 1],
-    #     [0, 0, 0, 0, 0, 0, 2, 0, 4],
-    #     [0, 0, 7, 0, 8, 0, 3, 0, 0]
-    #     ]
 
         # puzzle =  self.build_board_from_str(puzzle_2_medium)
         for row in range(0, 9):
@@ -575,15 +564,6 @@ class Sudoku:
         # self.printBoard(self.bt_puzzle)
         self.bt_count = bt_count
         return
-
-
-    def solve_most_constrained_var(self):
-        """
-        Most Constrained Variable: Pick a slot that has the least number of values in its domain.
-        @rtype: -1 or Sudoku
-        """
-        # TODO get most constrained variable
-
 
 
     def solve(self, level=0):
