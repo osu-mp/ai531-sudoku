@@ -5,9 +5,9 @@
 # Joe Nguyen
 # Matthew Pacey
 
-import csv
 import time
 import unittest
+from collections import defaultdict
 
 from naked_singles import NakedSingles
 from sudoku import Sudoku
@@ -108,6 +108,128 @@ class SudokuDataCollection(unittest.TestCase):
         print(csv_report)
         print(f'Solved {solved_count} of {len(self.puzzles)} {pct:2.0f}%')
 
+    def test_report_data(self):
+        """
+        Generate data to put into latex report
+        """
+
+
+        print('Fixed Baseline & Backtracking')
+
+        total_puzzles = {}
+        total_solved = {}
+        avg_time = {}
+        avg_ns = {}
+        avg_hs = {}
+        avg_np = {}
+        avg_hp = {}
+        avg_nt = {}
+        avg_ht = {}
+        # TODO backtracks
+
+        all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
+
+        for difficulty in all_difficulties:
+            total_solved[difficulty] = {}
+            avg_time[difficulty] = {}
+
+            # print(f'\nDifficulty: {difficulty}')
+            for level in range(1, 4):
+
+                puzzle_count = 0
+                solved_count = 0
+                runtime_sum = 0.
+                sum_ns = 0
+                sum_hs = 0
+                sum_np = 0
+                sum_hp = 0
+                sum_nt = 0
+                sum_ht = 0
+
+                # print(f'Level {level}')
+
+                for puzzle_name in self.puzzles.keys():
+                    # each puzzle is named like '10 Hard' so use the name to see if it is the difficulty we're testing
+                    if difficulty not in puzzle_name:
+                        continue
+
+                    puzzle_count += 1
+
+                    backtracks = 0
+
+                    start = time.time()  # get start time
+                    # solve puzzle
+                    sudoku = Sudoku(self.puzzles[puzzle_name])
+                    (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
+
+                    if level == 3:          # only count singles/pairs/triples at highest level
+                        sum_ns += ns
+                        sum_hs += hs
+                        sum_np += np
+                        sum_hp += hp
+                        sum_nt += nt
+                        sum_ht += ht
+
+                    end = time.time()
+                    runtime_sum += end - start
+
+                    if sudoku.is_board_solved():
+                        solved_count += 1
+
+                total_solved[difficulty][level] = solved_count
+                avg_time[difficulty][level] = runtime_sum / puzzle_count
+                total_puzzles[difficulty] = puzzle_count
+
+                if level == 3:  # only count singles/pairs/triples at highest level
+                    avg_ns[difficulty] = sum_ns # / puzzle_count
+                    avg_hs[difficulty] = sum_hs #/ puzzle_count
+                    avg_np[difficulty] = sum_np #/ puzzle_count
+                    avg_hp[difficulty] = sum_hp #/ puzzle_count
+                    avg_nt[difficulty] = sum_nt #/ puzzle_count
+                    avg_ht[difficulty] = sum_ht #/ puzzle_count
+
+
+        print('Problems Solved')
+        row = ''
+        level = 3
+        for difficulty in all_difficulties:
+            pct = total_solved[difficulty][level] / total_puzzles[difficulty] * 100
+            row += ' & %2.0f \\%%' % pct
+        print(f'{row} \\\\')
+
+        for level in range(1, 4):
+            print(f'Level {level}')
+            row = ''
+            for difficulty in all_difficulties:
+                pct = total_solved[difficulty][level] / total_puzzles[difficulty] * 100
+                row += ' & %2.0f \\%%' % pct
+            print(f'{row} \\\\')
+
+        print('Avg time')
+        row = ''
+        level = 3                            # report average time using all inference rules (level 3)
+        for difficulty in all_difficulties:
+            row += ' & %1.5f' % avg_time[difficulty][level]
+        print(f'{row} \\\\')
+
+        print('Singles')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d + %d' % (avg_ns[difficulty], avg_hs[difficulty])
+        print(f'{row} \\\\')
+
+        print('Pairs')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d + %d' % (avg_np[difficulty], avg_hp[difficulty])
+        print(f'{row} \\\\')
+
+        print('Triples')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d + %d' % (avg_nt[difficulty], avg_ht[difficulty])
+        print(f'{row} \\\\')
 
 if __name__ == '__main__':
     unittest.main()
+
