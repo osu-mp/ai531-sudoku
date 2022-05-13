@@ -58,6 +58,47 @@ class HiddenSingles(InferenceRule):
                     cell_changed = True
                     self.puzzle.is_board_valid()
 
+    def evaluate2d(self):
+        cell_changed = True  # run init at least once
+        while cell_changed:  # keep running when a change is made
+            cell_changed = False  # this ensures a change is made every loop
+
+            # check rows
+            for row in range(9):
+                cells = self.puzzle.get_row(row)
+                matches = self.evaluate_group(cells)
+                # print(f'Current puzzle, checking row {row}')
+                # self.puzzle.print(simple=False)
+                for match in matches:
+                    # print(f'Operating on match: {match}')
+                    self.puzzle.board[match.row][match.col] = [match.val]
+                    changed = self.puzzle.solve_fixed_baseline_backtrack_entry(0)
+                    self.move_count += 1
+                    cell_changed = True
+                    self.puzzle.is_board_valid()
+
+            # # check cols
+            for col in range(9):
+                cells = self.puzzle.get_col(col)
+                matches = self.evaluate_group(cells)
+                for match in matches:
+                    self.puzzle.board[match.row][match.col] = [match.val]
+                    changed = self.puzzle.solve_fixed_baseline_backtrack_entry(0)
+                    self.move_count += 1
+                    cell_changed = True
+                    self.puzzle.is_board_valid()
+
+            # # check regions
+            for n in range(9):
+                cells = self.puzzle.get_region(n)
+                matches = self.evaluate_group(cells)
+                for match in matches:
+                    self.puzzle.board[match.row][match.col] = [match.val]
+                    changed = self.puzzle.solve_fixed_baseline_backtrack_entry(0)
+                    self.move_count += 1
+                    cell_changed = True
+                    self.puzzle.is_board_valid()
+
     @staticmethod
     def evaluate_group(cells):
         """
