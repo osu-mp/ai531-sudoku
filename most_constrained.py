@@ -126,17 +126,6 @@ EVIL_SUDOKU = '''000 006 009
 
 
 def test_most_constrained_func():
-    # puzzle_2_medium = '''020 004 000
-    # 003 000 204
-    # 140 080 503
-    # 030 802 000
-    # 200 000 006
-    # 000 409 050
-    # 402 070 081
-    # 807 000 600
-    # 000 600 070
-    # '''
-
     sudoku = Sudoku(EVIL_SUDOKU)
     # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
     rules = [HiddenTriples]
