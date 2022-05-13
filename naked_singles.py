@@ -32,16 +32,14 @@ class NakedSingles(InferenceRule):
                             cell_changed = True
 
 
-def evaulate2d(self):
-        cell_changed = True  # run init at least once
-        while cell_changed:  # keep running when a change is made
-            cell_changed = False  # this ensures a change is made every loop
-            for row in range(9):
-                for col in range(9):
-                    value = self.puzzle.board[row][col]
-                    if len(value) == 1:
-                        cell = Cell(row, col, value[0])
-                        changed = self.puzzle.solve_fixed_baseline_backtrack_entry(0)
-                        if changed:
-                            self.move_count += 1
-                            cell_changed = True
+    def evaulate2d(self, puzzle, value):
+                for row in range(9):
+                    for col in range(9):
+                        value = puzzle[row][col]
+                        if len(value) == 1:
+                            #this solves in 3-D
+                            cell = Cell(row, col, value[0])
+                            changed = self.puzzle.solve_cell(cell)
+                            if changed:
+                                self.move_count += 1
+                            

@@ -543,6 +543,10 @@ class Sudoku:
     def solve_fixed_baseline_backtrack_entry(self):
         self.bt_puzzle = self.get_bt_puzzle()
         return self.solve_fixed_baseline_backtrack(0)
+    
+    def inference_fixed_baseline_backtrack(self):
+        self.bt_puzzle = self.get_bt_puzzle()
+        return self.inference_fixed_baseline_backtrack(0)
 
     def solve_fixed_baseline_backtrack(self, bt_count):
     # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
@@ -565,6 +569,23 @@ class Sudoku:
         self.bt_count = bt_count
         return
 
+
+    def inference_fixed_baseline_backtrack(self, bt_count):
+    # NS inference for check instead of is_valid function
+        ns = NakedSingles(self)
+        for row in range(0, 9):
+            for col in range(0, 9):
+                if self.bt_puzzle[row][col] == 0:
+                    for digit in range(1, 10):
+                        if ns.evaulate2d( self.bt_puzzle, digit):
+                            self.bt_puzzle[row][col] = digit
+                            self.solve_fixed_baseline_backtrack(bt_count)
+                            bt_count = bt_count + 1
+                            self.bt_puzzle[row][col] = 0
+                    return
+
+        self.bt_count = bt_count
+        return
 
     def solve(self, level=0):
         """
