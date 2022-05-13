@@ -3,21 +3,9 @@ import math
 from typing import List
 
 from cell import Cell
+from hidden_triples import HiddenTriples
+from inference import InferenceRule
 from sudoku import Sudoku
-
-from queue import PriorityQueue
-
-# q = PriorityQueue()
-#
-# q.put((4, 'Read'))
-# q.put((2, 'Play'))
-# q.put((5, 'Write'))
-# q.put((1, 'Code'))
-# q.put((3, 'Study'))
-#
-# while not q.empty():
-#     next_item = q.get()
-#     print(next_item)
 
 
 def get_sorted_constrained_vars(sudoku: Sudoku):
@@ -50,31 +38,47 @@ def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
     # Checks for repeated values in column
 
     for col_counter in range(0, 9):
-        if is_conflict_other_cell(val, board[row][col_counter]):
-            return False
+        if col_counter != col:
+            if is_conflict_other_cell(val, board[row][col_counter]):
+                return False
 
     # Checks for repeated values in row
     for row_counter in range(0, 9):
-        if is_conflict_other_cell(val, board[row_counter][col]):
-            return False
+        if row_counter != row:
+            if is_conflict_other_cell(val, board[row_counter][col]):
+                return False
 
     # Checks for repeated values in 3x3 grid
     row_for_small_grid = math.floor(row / 3) * 3
     col_for_small_grid = math.floor(col / 3) * 3
     for miniRow in range(0, 3):
         for miniCol in range(0, 3):
-            if is_conflict_other_cell(val, board[row_for_small_grid + miniRow][col_for_small_grid + miniCol]):
-                return False
-
+            row_mini = row_for_small_grid + miniRow
+            col_mini = col_for_small_grid + miniCol
+            if row_mini != row and col_mini != col:
+                if is_conflict_other_cell(val, board[row_mini][col_mini]):
+                    return False
     return True
 
 
-def solve_most_constrained_var(sudoku: Sudoku, history: List):
+def solve_most_constrained_var(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = []):
     """
     Most Constrained Variable: Pick a slot that has the least number of values in its domain.
     """
-    if sudoku.is_board_solved():
-        return sudoku
+    # if sudoku.is_board_solved():
+    #     return sudoku
+
+    for rule in rules:
+        rule_obj = rule(sudoku)
+        try:
+            rule_obj.evaluate()
+        except Exception as e:
+            return -1
+        # rule_obj.evaluate()
+
+        sudoku = rule_obj.puzzle
+        if sudoku.is_board_solved():
+            return sudoku
 
     queue_cells = get_sorted_constrained_vars(sudoku)
     if len(queue_cells) == 0:
@@ -98,7 +102,7 @@ def solve_most_constrained_var(sudoku: Sudoku, history: List):
                     # print('Error = ', e)
                     continue
 
-                possible_sudoku = solve_most_constrained_var(new_sudoku, history + [((i, j), val)])
+                possible_sudoku = solve_most_constrained_var(new_sudoku, history + [((i, j), val)], rules)
                 if possible_sudoku != -1:
                     return possible_sudoku
 
@@ -109,19 +113,36 @@ def solve_most_constrained_var(sudoku: Sudoku, history: List):
     # return sudoku
 
 
-if __name__ == '__main__':
-    puzzle_2_medium = '''020 004 000
-    003 000 204
-    140 080 503
-    030 802 000
-    200 000 006
-    000 409 050
-    402 070 081
-    807 000 600
-    000 600 070
-    '''
-    sudoku = Sudoku(puzzle_2_medium)
-    solved_sudoku = solve_most_constrained_var(sudoku, [])
-    assert solved_sudoku.is_board_solved()
-    solved_sudoku.print()
+EVIL_SUDOKU = '''000 006 009
+090 300 108
+076 000 402
+000 800 005
+000 502 000
+900 003 000
+409 000 830
+605 004 090
+700 100 000
+'''
 
+
+def test_most_constrained_func():
+    sudoku = Sudoku(EVIL_SUDOKU)
+    # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
+    rules = [HiddenTriples]
+    solved_sudoku = solve_most_constrained_var(sudoku, [], rules)
+    # assert solved_sudoku.is_board_solved()
+    if solved_sudoku != -1:
+        solved_sudoku.print()
+    else:
+        print('error')
+
+
+def test_most_constrained_self():
+    sudoku = Sudoku(EVIL_SUDOKU)
+    # print(sudoku.solve_most_constrained_var())
+    sudoku.print()
+
+
+if __name__ == '__main__':
+    # test_most_constrained_self()
+    test_most_constrained_func()
