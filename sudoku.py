@@ -57,8 +57,6 @@ Report your results in the form of a mini-paper as you did for the other two ass
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
-
-
     def __init__(self, puzzle_str):
         """
         Init the Sudoku board with a puzzle string
@@ -181,7 +179,7 @@ class Sudoku:
             values.append(cell.val)
         return self.is_group_valid(values)
 
-    def print(self,board , simple=True, screen=True):
+    def print(self, simple=True, screen=True):
         """
         Print the current board
         If simple is True, this prints a 9x9 grid of single values (blanks for unsolved cells)
@@ -190,6 +188,7 @@ class Sudoku:
         :return:
         """
         solved = 0  # count number of solved cells
+        board = ""
 
         if simple:
             
