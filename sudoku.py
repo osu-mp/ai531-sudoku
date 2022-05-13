@@ -576,7 +576,6 @@ class Sudoku:
         # self.printBoard(self.bt_puzzle)
         self.bt_count = bt_count
         return
-
     # def BT_most_constrained_var(self, history: List):
     #     if self.is_board_solved():
     #         return True

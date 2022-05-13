@@ -110,6 +110,7 @@ class SudokuDataCollection(unittest.TestCase):
             print(f'{puzzle:15s} {start_count:2d} {end_count:2d} {pct:2.0f}%')
             # csv_report += f'{puzzle},{start_count},{end_count},{end_count-start_count},{pct},{ns},{hs},{np},{hp},{nt},{ht}\n'
 
+
             if end_count == 81:
                 solved_count += 1
 
