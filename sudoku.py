@@ -4,6 +4,7 @@
 # Wadood Alam
 # Joe Nguyen
 # Matthew Pacey
+from typing import Dict, List, Literal
 
 from unicodedata import digit
 from cell import Cell
@@ -52,12 +53,20 @@ There is a set of sample problems here (Links to an external site.)Links to an e
 Report your results in the form of a mini-paper as you did for the other two assignments. Give the pseudocode for the algorithm. Discuss how the results vary with the difficulty of the problems, and the effectiveness of the most-constrained variable heuristic compared to fixed selection. Also report on the effectiveness of rule subsets in reducing the search. Is the number of backtracks reduced by increased inference rules? What about the total time for solving the puzzles? Please feel free to include any other observations.
 """
 
-
+EMPTY_STR = '''000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000'''
 
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
-    def __init__(self, puzzle_str):
+    def __init__(self, puzzle_str=EMPTY_STR):
         """
         Init the Sudoku board with a puzzle string
         The board is a 3d array: board[row][col][values] where:
@@ -67,8 +76,9 @@ class Sudoku:
             The inference rules will reduce this list as they execute
             If values has only one number, that is the final value
         """
-        self.board = []
+        self.board = [] # type: Dict[int, Dict[int, List]]
         self.build_board_from_str(puzzle_str)
+        self.init_constraints()
 
     def build_board_from_str(self, puzzle_str):
         """
@@ -152,7 +162,7 @@ class Sudoku:
         for row in range(9):
             cells = self.get_row(row)
             if not self.is_cell_group_valid(cells):
-                self.print()
+                # self.print()
                 raise Exception(f'Row invalid: {row}')
 
         # check all cols
@@ -193,6 +203,7 @@ class Sudoku:
         if simple:
             
             for row in range(9):
+                # board += '(' + str(row) + ') '
                 for col in range(9):
                     cell = self.board[row][col]
                     if len(cell) == 1:
@@ -213,6 +224,7 @@ class Sudoku:
             # the big board is 9 cells by 3 rows/cols in each cell -> 27x27 grid
             bigBoard = [['_' for col in range(27)] for row in range(27)]
             for row in range(9):
+
                 for col in range(9):
                     cell = self.board[row][col]
                     if len(cell) == 1:
@@ -240,6 +252,7 @@ class Sudoku:
             rowCount = 0
             colCount = 0
             for row in bigBoard:
+                # board += '(' + str(row) + ') '
                 for col in row:
                     board += col
                     colCount += 1
@@ -261,7 +274,7 @@ class Sudoku:
         """
         return self.print()
 
-    def get_row(self, row, omit_col=None):
+    def get_row(self, row, omit_col=None) -> List[Cell]:
         """
         Get all cells in the given row
         Optional: if an index is given for omit_col that column's cell will not be included
@@ -353,7 +366,7 @@ class Sudoku:
         for neighbor in self.get_row(row, omit_col=col):
             if val in neighbor.val:
                 self.board[row][neighbor.col].remove(val)
-                # print('Removed ROW possible value of %d at %d,%d' % (val, row, c))
+                # print('Removed ROW possible value of %d at %d,%d' % (val, row, neighbor.col))
                 count += 1
 
                 # TODO : if the updated cell only has one value, update its neighbors
@@ -369,7 +382,7 @@ class Sudoku:
         for neighbor in self.get_col(col, omit_row=row):
             if val in neighbor.val:
                 self.board[neighbor.row][col].remove(val)
-                # print('Removed COL possible value of %d at %d,%d' % (val, row, c))
+                # print('Removed COL possible value of %d at %d,%d' % (val, neighbor.row, col))
                 count += 1
 
                 # TODO : if the updated cell only has one value, update its neighbors
@@ -385,6 +398,7 @@ class Sudoku:
         for neighbor in self.get_group(row, col, omit_cell=True):
             if val in self.board[neighbor.row][neighbor.col]:
                 self.board[neighbor.row][neighbor.col].remove(val)
+                # print('Removed GROUP possible value of %d at %d,%d' % (val, neighbor.row, neighbor.col))
                 count += 1
 
                 # TODO : if the updated cell only has one value, update its neighbors
@@ -523,56 +537,34 @@ class Sudoku:
                     this_row.append(cell_value[0])
                 else:
                     this_row.append(0)
-            bt_puzzle.append(this_row
-                             )
+            bt_puzzle.append(this_row)
         return bt_puzzle
+
+    def solve_fixed_baseline_backtrack_entry(self):
+        self.bt_puzzle = self.get_bt_puzzle()
+        return self.solve_fixed_baseline_backtrack(0)
 
     def solve_fixed_baseline_backtrack(self, bt_count):
     # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
     # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
     # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
-        puzzle = [
-        [0, 0, 2, 0, 9, 0, 6, 0, 0],
-        [6, 0, 9, 0, 0, 0, 0, 0, 0],
-        [4, 8, 0, 0, 0, 6, 0, 0, 0],
-        [0, 0, 8, 4, 0, 2, 0, 9, 0],
-        [3, 0, 0, 0, 0, 0, 0, 0, 7],
-        [0, 7, 0, 3, 0, 9, 1, 0, 0],
-        [0, 0, 0, 6, 0, 0, 0, 5, 1],
-        [0, 0, 0, 0, 0, 0, 2, 0, 4],
-        [0, 0, 7, 0, 8, 0, 3, 0, 0]
-        ]
-        puzzle_2_medium = '''020 004 000
-    003 000 204
-    140 080 503
-    030 802 000
-    200 000 006
-    000 409 050
-    402 070 081
-    807 000 600
-    000 600 070
-    '''
+
         # puzzle =  self.build_board_from_str(puzzle_2_medium)
         for row in range(0, 9):
             for col in range(0, 9):
-                if puzzle[row][col] == 0:
+                if self.bt_puzzle[row][col] == 0:
                     for digit in range(1, 10):
-                        if self.is_valid(digit, puzzle, row, col):
-                            puzzle[row][col] = digit
-                            self.solve_fixed_baseline_backtrack()
+                        if self.is_valid(digit, self.bt_puzzle, row, col):
+                            self.bt_puzzle[row][col] = digit
+                            self.solve_fixed_baseline_backtrack(bt_count)
                             bt_count = bt_count + 1
-                            puzzle[row][col] = 0
-                    return   
-        print(bt_count)            
-        self.printBoard(puzzle)
+                            self.bt_puzzle[row][col] = 0
+                    return
+        # print(bt_count)
+        # self.printBoard(self.bt_puzzle)
+        self.bt_count = bt_count
+        return
 
-
-    def solve_most_constrained_var(self):
-        """
-
-        """
-        # TODO get most constrained variable
-        raise Exception('TODO Joe')
 
     def solve(self, level=0):
         """
