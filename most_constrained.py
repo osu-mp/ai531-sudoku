@@ -110,16 +110,26 @@ def solve_most_constrained_var(sudoku: Sudoku, history: List):
 
 
 if __name__ == '__main__':
-    puzzle_2_medium = '''020 004 000
-    003 000 204
-    140 080 503
-    030 802 000
-    200 000 006
-    000 409 050
-    402 070 081
-    807 000 600
-    000 600 070
-    '''
+    # puzzle_2_medium = '''020 004 000
+    # 003 000 204
+    # 140 080 503
+    # 030 802 000
+    # 200 000 006
+    # 000 409 050
+    # 402 070 081
+    # 807 000 600
+    # 000 600 070
+    # '''
+
+    puzzle_2_medium = '''240 300 000 
+    000 520 407
+    000 046 008
+    610 700 084
+    009 060 500
+    730 005 061
+    100 470 000
+    302 051 000
+    000 002 019'''
     sudoku = Sudoku(puzzle_2_medium)
     solved_sudoku = solve_most_constrained_var(sudoku, [])
     assert solved_sudoku.is_board_solved()

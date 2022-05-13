@@ -11,8 +11,10 @@ from collections import defaultdict
 
 from naked_singles import NakedSingles
 from sudoku import Sudoku
+from most_constrained import *
 
 puzzle_file = 'puzzles.txt'
+
 
 class SudokuDataCollection(unittest.TestCase):
     def setUp(self):
@@ -42,7 +44,6 @@ class SudokuDataCollection(unittest.TestCase):
                 else:
                     puzzle_str += line
 
-
     def test_algos(self):
         '''
         Load puzzles.txt
@@ -62,8 +63,8 @@ class SudokuDataCollection(unittest.TestCase):
         sudoku = Sudoku(self.puzzles['1 Easy'])
         print('start')
         sudoku.print(simple=False)
-        #sudoku.init_constraints()
-        #print('after constraints initialized')
+        # sudoku.init_constraints()
+        # print('after constraints initialized')
 
         print('after constraints initialized')
         ns = NakedSingles(sudoku)
@@ -85,27 +86,30 @@ class SudokuDataCollection(unittest.TestCase):
         Print out results for inference rules run against all puzzles
         """
         solved_count = 0
-        csv_report = 'puzzle name,given cells,solved cells,solved delta,solved pct,' + \
-                     'naked singles,hidden singles,naked pairs,hidden pairs,hidden triples,naked triples\n'
+        # csv_report = 'puzzle name,given cells,solved cells,solved delta,solved pct,' + \
+        #              'naked singles,hidden singles,naked pairs,hidden pairs,hidden triples,naked triples\n'
 
         for puzzle in self.puzzles:
             sudoku = Sudoku(self.puzzles[puzzle])
+            # print(self.puzzles[puzzle])
+            # sudoku.print()
 
             start_count = sudoku.get_solved_cell_count()
             # record the naked singles, hidden singles, pairs, triples from the solve
-            (ns, hs, np, hp, nt, ht) = sudoku.solve(level=4)            # run at max level
-            end_count = sudoku.get_solved_cell_count()
+            # (ns, hs, np, hp, nt, ht) = sudoku.solve(level=4)            # run at max level
+            solved_sudoku = solve_most_constrained_var(sudoku, [])
+            # solved_sudoku.print()
+            end_count = solved_sudoku.get_solved_cell_count()
 
             pct = 100 * end_count / 81
-            # print(f'{puzzle:15s} {start_count:2d} {end_count:2d} {pct:2.0f}%')
-            csv_report += f'{puzzle},{start_count},{end_count},{end_count-start_count},{pct},{ns},{hs},{np},{hp},{nt},{ht}\n'
-
+            print(f'{puzzle:15s} {start_count:2d} {end_count:2d} {pct:2.0f}%')
+            # csv_report += f'{puzzle},{start_count},{end_count},{end_count-start_count},{pct},{ns},{hs},{np},{hp},{nt},{ht}\n'
 
             if end_count == 81:
                 solved_count += 1
 
         pct = 100 * solved_count / len(self.puzzles)
-        print(csv_report)
+        # print(csv_report)
         print(f'Solved {solved_count} of {len(self.puzzles)} {pct:2.0f}%')
 
     def test_report_data(self):
@@ -155,16 +159,16 @@ class SudokuDataCollection(unittest.TestCase):
 
                     puzzle_count += 1
 
-
                     start = time.time()  # get start time
                     # solve puzzle
                     sudoku = Sudoku(self.puzzles[puzzle_name])
-                    (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
+                    # (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
+                    # (ns, hs, np, hp, nt, ht) = (0, 0, 0, 0, 0, 0)
+                    solution = solve_most_constrained_var(sudoku, [])
                     end = time.time()
                     runtime_sum += end - start
 
-
-                    if level == 3:          # only count singles/pairs/triples at highest level
+                    if level == 3:  # only count singles/pairs/triples at highest level
                         sum_ns += ns
                         sum_hs += hs
                         sum_np += np
@@ -184,15 +188,14 @@ class SudokuDataCollection(unittest.TestCase):
                 total_puzzles[difficulty] = puzzle_count
 
                 if level == 3:  # only count singles/pairs/triples at highest level
-                    avg_ns[difficulty] = sum_ns # / puzzle_count
-                    avg_hs[difficulty] = sum_hs #/ puzzle_count
-                    avg_np[difficulty] = sum_np #/ puzzle_count
-                    avg_hp[difficulty] = sum_hp #/ puzzle_count
-                    avg_nt[difficulty] = sum_nt #/ puzzle_count
-                    avg_ht[difficulty] = sum_ht #/ puzzle_count
+                    avg_ns[difficulty] = sum_ns  # / puzzle_count
+                    avg_hs[difficulty] = sum_hs  # / puzzle_count
+                    avg_np[difficulty] = sum_np  # / puzzle_count
+                    avg_hp[difficulty] = sum_hp  # / puzzle_count
+                    avg_nt[difficulty] = sum_nt  # / puzzle_count
+                    avg_ht[difficulty] = sum_ht  # / puzzle_count
 
                     avg_backtracks[difficulty] = sum_backtracks / puzzle_count
-
 
         print('Problems Solved')
         row = ''
@@ -244,4 +247,3 @@ class SudokuDataCollection(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
