@@ -51,12 +51,20 @@ There is a set of sample problems here (Links to an external site.)Links to an e
 Report your results in the form of a mini-paper as you did for the other two assignments. Give the pseudocode for the algorithm. Discuss how the results vary with the difficulty of the problems, and the effectiveness of the most-constrained variable heuristic compared to fixed selection. Also report on the effectiveness of rule subsets in reducing the search. Is the number of backtracks reduced by increased inference rules? What about the total time for solving the puzzles? Please feel free to include any other observations.
 """
 
-
+EMPTY_STR = '''000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000
+000 000 000'''
 
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
-    def __init__(self, puzzle_str):
+    def __init__(self, puzzle_str=EMPTY_STR):
         """
         Init the Sudoku board with a puzzle string
         The board is a 3d array: board[row][col][values] where:
@@ -263,7 +271,7 @@ class Sudoku:
         """
         return self.print()
 
-    def get_row(self, row, omit_col=None):
+    def get_row(self, row, omit_col=None) -> List[Cell]:
         """
         Get all cells in the given row
         Optional: if an index is given for omit_col that column's cell will not be included
