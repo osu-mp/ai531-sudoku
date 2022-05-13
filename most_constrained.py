@@ -61,12 +61,12 @@ def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
     return True
 
 
-def solve_most_constrained_var(sudoku: Sudoku, history: List, rules: List[InferenceRule]):
+def solve_most_constrained_var(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = []):
     """
     Most Constrained Variable: Pick a slot that has the least number of values in its domain.
     """
-    if sudoku.is_board_solved():
-        return sudoku
+    # if sudoku.is_board_solved():
+    #     return sudoku
 
     for rule in rules:
         rule_obj = rule(sudoku)
@@ -126,17 +126,6 @@ EVIL_SUDOKU = '''000 006 009
 
 
 def test_most_constrained_func():
-    # puzzle_2_medium = '''020 004 000
-    # 003 000 204
-    # 140 080 503
-    # 030 802 000
-    # 200 000 006
-    # 000 409 050
-    # 402 070 081
-    # 807 000 600
-    # 000 600 070
-    # '''
-
     sudoku = Sudoku(EVIL_SUDOKU)
     # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
     rules = [HiddenTriples]

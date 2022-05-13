@@ -10,6 +10,7 @@ import unittest
 from collections import defaultdict
 
 from naked_singles import NakedSingles
+from simple_BT import solve_simple_BT
 from sudoku import Sudoku
 from most_constrained import *
 
@@ -17,6 +18,8 @@ puzzle_file = 'puzzles.txt'
 
 
 class SudokuDataCollection(unittest.TestCase):
+# class SudokuDataCollection():
+
     def setUp(self):
         self.load_puzzles()
 
@@ -97,7 +100,9 @@ class SudokuDataCollection(unittest.TestCase):
             start_count = sudoku.get_solved_cell_count()
             # record the naked singles, hidden singles, pairs, triples from the solve
             # (ns, hs, np, hp, nt, ht) = sudoku.solve(level=4)            # run at max level
-            solved_sudoku = solve_most_constrained_var(sudoku, [])
+            # solved_sudoku = solve_most_constrained_var(sudoku)
+            # sudoku.print()
+            solved_sudoku = solve_simple_BT(sudoku)
             # solved_sudoku.print()
             end_count = solved_sudoku.get_solved_cell_count()
 
@@ -247,3 +252,6 @@ class SudokuDataCollection(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    # actor = SudokuDataCollection()
+    # actor.setUp()
+    # actor.test_all_puzzles()

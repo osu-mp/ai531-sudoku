@@ -1,33 +1,11 @@
 import copy
-import math
 from typing import List
 
 from cell import Cell
-from hidden_pairs import HiddenPairs
-from hidden_singles import HiddenSingles
 from hidden_triples import HiddenTriples
 from inference import InferenceRule
 from most_constrained import is_valid_cell_value
-from naked_pairs import NakedPairs
-from naked_singles import NakedSingles
-from naked_triples import NakedTriples
 from sudoku import Sudoku
-# import sudoku
-
-from queue import PriorityQueue
-
-
-# q = PriorityQueue()
-#
-# q.put((4, 'Read'))
-# q.put((2, 'Play'))
-# q.put((5, 'Write'))
-# q.put((1, 'Code'))
-# q.put((3, 'Study'))
-#
-# while not q.empty():
-#     next_item = q.get()
-#     print(next_item)
 
 
 def find_next_cell(i, j):
@@ -41,9 +19,9 @@ def find_next_cell(i, j):
             return None
 
 
-def solve_simple_BT(sudoku: Sudoku, history: List, rules: List[InferenceRule], cell):
-    if sudoku.is_board_solved():
-        return sudoku
+def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = [], cell=(0, 0)):
+    # if sudoku.is_board_solved():
+    #     return sudoku
 
     for rule in rules:
         rule_obj = rule(sudoku)
@@ -82,7 +60,8 @@ def solve_simple_BT(sudoku: Sudoku, history: List, rules: List[InferenceRule], c
                     return possible_sudoku
             else:
                 # this turn is the last cell
-                return new_sudoku.is_board_solved()
+                if new_sudoku.is_board_solved():
+                    return new_sudoku
 
     return -1
     # print(f'out of values for {i}, {j}')
@@ -102,7 +81,7 @@ EVIL_SUDOKU = '''000 006 009
 '''
 
 
-def test_most_constrained_func():
+def test_simple_BT_func():
     # puzzle_2_medium = '''020 004 000
     # 003 000 204
     # 140 080 503
@@ -114,10 +93,20 @@ def test_most_constrained_func():
     # 000 600 070
     # '''
 
-    sudoku = Sudoku(EVIL_SUDOKU)
+    puzzle = '''240 300 000
+000 520 407
+000 046 008
+610 700 084
+009 060 500
+730 005 061
+100 470 000
+302 051 000
+000 002 019'''
+
+    sudoku = Sudoku(puzzle)
     # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
-    rules = [HiddenTriples]
-    # rules = []
+    # rules = [HiddenTriples]
+    rules = []
     # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
 
     solved_sudoku = solve_simple_BT(sudoku, [], rules, (0, 0))
@@ -128,13 +117,7 @@ def test_most_constrained_func():
         print('error')
 
 
-def test_most_constrained_self():
-    sudoku = Sudoku(EVIL_SUDOKU)
-    print(sudoku.solve_most_constrained_var())
-    sudoku.print()
-
-
 if __name__ == '__main__':
     # test_most_constrained_self()
-    test_most_constrained_func()
+    test_simple_BT_func()
     # print(find_next_cell(8, 1))
