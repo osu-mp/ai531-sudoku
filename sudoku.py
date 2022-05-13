@@ -523,48 +523,44 @@ class Sudoku:
                     this_row.append(cell_value[0])
                 else:
                     this_row.append(0)
-            bt_puzzle.append(this_row
-                             )
+            bt_puzzle.append(this_row)
         return bt_puzzle
+
+    def solve_fixed_baseline_backtrack_entry(self):
+        self.bt_puzzle = self.get_bt_puzzle()
+        return self.solve_fixed_baseline_backtrack(0)
 
     def solve_fixed_baseline_backtrack(self, bt_count):
     # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
     # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
     # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
-        puzzle = [
-        [0, 0, 2, 0, 9, 0, 6, 0, 0],
-        [6, 0, 9, 0, 0, 0, 0, 0, 0],
-        [4, 8, 0, 0, 0, 6, 0, 0, 0],
-        [0, 0, 8, 4, 0, 2, 0, 9, 0],
-        [3, 0, 0, 0, 0, 0, 0, 0, 7],
-        [0, 7, 0, 3, 0, 9, 1, 0, 0],
-        [0, 0, 0, 6, 0, 0, 0, 5, 1],
-        [0, 0, 0, 0, 0, 0, 2, 0, 4],
-        [0, 0, 7, 0, 8, 0, 3, 0, 0]
-        ]
-        puzzle_2_medium = '''020 004 000
-    003 000 204
-    140 080 503
-    030 802 000
-    200 000 006
-    000 409 050
-    402 070 081
-    807 000 600
-    000 600 070
-    '''
+    #     puzzle = [
+    #     [0, 0, 2, 0, 9, 0, 6, 0, 0],
+    #     [6, 0, 9, 0, 0, 0, 0, 0, 0],
+    #     [4, 8, 0, 0, 0, 6, 0, 0, 0],
+    #     [0, 0, 8, 4, 0, 2, 0, 9, 0],
+    #     [3, 0, 0, 0, 0, 0, 0, 0, 7],
+    #     [0, 7, 0, 3, 0, 9, 1, 0, 0],
+    #     [0, 0, 0, 6, 0, 0, 0, 5, 1],
+    #     [0, 0, 0, 0, 0, 0, 2, 0, 4],
+    #     [0, 0, 7, 0, 8, 0, 3, 0, 0]
+    #     ]
+
         # puzzle =  self.build_board_from_str(puzzle_2_medium)
         for row in range(0, 9):
             for col in range(0, 9):
-                if puzzle[row][col] == 0:
+                if self.bt_puzzle[row][col] == 0:
                     for digit in range(1, 10):
-                        if self.is_valid(digit, puzzle, row, col):
-                            puzzle[row][col] = digit
-                            self.solve_fixed_baseline_backtrack()
+                        if self.is_valid(digit, self.bt_puzzle, row, col):
+                            self.bt_puzzle[row][col] = digit
+                            self.solve_fixed_baseline_backtrack(bt_count)
                             bt_count = bt_count + 1
-                            puzzle[row][col] = 0
-                    return   
-        print(bt_count)            
-        self.printBoard(puzzle)
+                            self.bt_puzzle[row][col] = 0
+                    return
+        # print(bt_count)
+        # self.printBoard(self.bt_puzzle)
+        self.bt_count = bt_count
+        return
 
 
     def solve_most_constrained_var(self):
