@@ -4,16 +4,18 @@
 # Wadood Alam
 # Joe Nguyen
 # Matthew Pacey
+import copy
 from typing import Dict, List, Literal
 
 from unicodedata import digit
 from cell import Cell
-from naked_singles import NakedSingles
-from hidden_singles import HiddenSingles
-from naked_pairs import NakedPairs
-from hidden_pairs import HiddenPairs
-from naked_triples import NakedTriples
-from hidden_triples import HiddenTriples
+# from most_constrained import get_sorted_constrained_vars, is_valid_cell_value
+# from naked_singles import NakedSingles
+# from hidden_singles import HiddenSingles
+# from naked_pairs import NakedPairs
+# from hidden_pairs import HiddenPairs
+# from naked_triples import NakedTriples
+# from hidden_triples import HiddenTriples
 import math
 
 """
@@ -22,7 +24,11 @@ Assignment Description
 
 In this assignment you will be implementing a solver for SuDoKu.
 
-SuDoKu is a constraint satisfaction problem, with all-diff constraints on each row, column, and box. The variables are cells and the values are numbers 1-9. You are going to implement backtracking search with constraint propagation. It maintains all possible candidate values, i.e., the current domain, for each cell after each assignment. The baseline system implements forward checking which removes candidate values for a variable when it violate some constraints, given the currently assigned values for other variables.
+SuDoKu is a constraint satisfaction problem, with all-diff constraints on each row, column, and box. The variables are cells and the values are numbers 1-9. 
+
+You are going to implement backtracking search with constraint propagation. It maintains all possible candidate values, i.e., the current domain, for each cell after each assignment. 
+
+The baseline system implements forward checking which removes candidate values for a variable when it violate some constraints, given the currently assigned values for other variables.
 
 The search begins by storing all possible values for each of the empty spots. Then it does constraint propagation through domain-specific inference rules. When the constraint propagation converges, then: 
 - if no candidates left for some cell, then backtrack from the current state. 
@@ -32,7 +38,9 @@ Experiment with two different ways of picking a cell.
 
 Fixed  Baseline. Use a fixed order, say, row-wise and top to bottom.
 Most Constrained Variable: Pick a slot that has the least number of values in its domain.
-Apply the following inference rules in the given priority order, i.e., keep applying rule 1 as long as it applies. When it does not, apply rule 2, and go back to rule 1 if it applies. In general, apply rule k only when rules 1...k-1 are not applicable. The inference terminates when no rule is applicable, at which point a search action (assignment) is taken. At any search state, the program maintains the set of assignments made in that state, and the candidate numbers available in all other cells. Here are the inference rules to be tried in that sequence.  
+Apply the following inference rules in the given priority order, i.e., keep applying rule 1 as long as it applies. When it does not, apply rule 2, and go back to rule 1 if it applies. In general, apply rule k only when rules 1...k-1 are not applicable. The inference terminates when no rule is applicable, at which point a search action (assignment) is taken. 
+
+At any search state, the program maintains the set of assignments made in that state, and the candidate numbers available in all other cells. Here are the inference rules to be tried in that sequence.  
 
 Naked Singles
 Hidden Singles.
@@ -48,7 +56,9 @@ Naked and Hidden Singles and Pairs
 Naked and Hidden Singles, Pairs, and Triples.
 Give a reasonable fixed bound on the number of search steps, say 1000, for each experiment.
 
-There is a set of sample problems here (Links to an external site.)Links to an external site.. The numbers are written in the file row-wise, with 0 representing empty slots. Each team should try to solve all the problems, starting with the easy ones. Report the number of problems solved and the number of backtracks with each problem. Experts appear to grade the problems by the complexity of rules needed to solve them without backtracking. Is this conjecture roughly correct? Grade each problem, by the set of rules used in solving it. Report also the average number of filled-in numbers (in the beginning) for each of these types of problems. Would this accurately reflect the difficulty of the problem?
+There is a set of sample problems here (Links to an external site.)Links to an external site.. The numbers are written in the file row-wise, with 0 representing empty slots. Each team should try to solve all the problems, starting with the easy ones. 
+
+Report the number of problems solved and the number of backtracks with each problem. Experts appear to grade the problems by the complexity of rules needed to solve them without backtracking. Is this conjecture roughly correct? Grade each problem, by the set of rules used in solving it. Report also the average number of filled-in numbers (in the beginning) for each of these types of problems. Would this accurately reflect the difficulty of the problem?
 
 Report your results in the form of a mini-paper as you did for the other two assignments. Give the pseudocode for the algorithm. Discuss how the results vary with the difficulty of the problems, and the effectiveness of the most-constrained variable heuristic compared to fixed selection. Also report on the effectiveness of rule subsets in reducing the search. Is the number of backtracks reduced by increased inference rules? What about the total time for solving the puzzles? Please feel free to include any other observations.
 """
@@ -63,6 +73,7 @@ EMPTY_STR = '''000 000 000
 000 000 000
 000 000 000'''
 
+
 class Sudoku:
     totalNodes = 0  # global counter of total nodes in total tree
 
@@ -76,7 +87,7 @@ class Sudoku:
             The inference rules will reduce this list as they execute
             If values has only one number, that is the final value
         """
-        self.board = [] # type: Dict[int, Dict[int, List]]
+        self.board = []  # type: Dict[int, Dict[int, List]]
         self.build_board_from_str(puzzle_str)
         self.init_constraints()
 
@@ -116,7 +127,7 @@ class Sudoku:
                 self.board[row][col] = [cell]
 
             col += 1
-            if col == 9:            # at the final column, move to the next row
+            if col == 9:  # at the final column, move to the next row
                 col = 0
                 row += 1
 
@@ -201,7 +212,7 @@ class Sudoku:
         board = ""
 
         if simple:
-            
+
             for row in range(9):
                 # board += '(' + str(row) + ') '
                 for col in range(9):
@@ -211,10 +222,10 @@ class Sudoku:
                         solved += 1
                     else:
                         board += ' '
-                    if col in [2, 5]:           # put divider between each 3 cols
+                    if col in [2, 5]:  # put divider between each 3 cols
                         board += '|'
-                board += '\n'                   # newline after each row
-                if row in [2, 5]:               # print divider between each 3 rows
+                board += '\n'  # newline after each row
+                if row in [2, 5]:  # print divider between each 3 rows
                     board += '-' * 11 + '\n'
         else:
             # for complex prints, print a 3x3 grid for each cell in the larger 9x9 grid
@@ -228,7 +239,7 @@ class Sudoku:
                 for col in range(9):
                     cell = self.board[row][col]
                     if len(cell) == 1:
-                        bigBoard[row * 3 + 1][col * 3 + 1] = str(cell[0])       # put values in center
+                        bigBoard[row * 3 + 1][col * 3 + 1] = str(cell[0])  # put values in center
                         solved += 1
                     else:
                         for i in range(1, 10):
@@ -256,17 +267,17 @@ class Sudoku:
                 for col in row:
                     board += col
                     colCount += 1
-                    if colCount == 3:       # new cell marker, add spacer
+                    if colCount == 3:  # new cell marker, add spacer
                         colCount = 0
                         board += ' '
                 board += '\n'
                 rowCount += 1
                 if rowCount == 3:
-                    board += ' ' * (81+27) + '\n'       # 81 numbers plus 27 spacers
+                    board += ' ' * (81 + 27) + '\n'  # 81 numbers plus 27 spacers
                     rowCount = 0
         board += 'Solved cells: %d (%2.f%%)\n' % (solved, solved * 100 / 81)
         print(board)
-        return board                            # for unit tests
+        return board  # for unit tests
 
     def __str__(self):
         """
@@ -316,7 +327,7 @@ class Sudoku:
         col_start = (col // 3) * 3  # round down to previous 3 group
         for r in range(row_start, row_start + 3):
             for c in range(col_start, col_start + 3):
-                if omit_cell and r == row and c == col:       # ignore the given cell
+                if omit_cell and r == row and c == col:  # ignore the given cell
                     continue
                 cell = Cell(r, c, self.board[r][c])
                 cells.append(cell)
@@ -328,24 +339,24 @@ class Sudoku:
         Return the cells in the given region number
         The regions are numbered 0 through 8, 0 is the upper left, 8 is the lower right
         """
-        if region_num == 0:                     # top left
+        if region_num == 0:  # top left
             return self.get_group(0, 0)
         elif region_num == 1:
-            return self.get_group(0, 3)         # top mid
+            return self.get_group(0, 3)  # top mid
         elif region_num == 2:
-            return self.get_group(0, 6)         # top right
+            return self.get_group(0, 6)  # top right
         elif region_num == 3:
-            return self.get_group(3, 0)         # left mid
+            return self.get_group(3, 0)  # left mid
         elif region_num == 4:
-            return self.get_group(3, 3)         # center
+            return self.get_group(3, 3)  # center
         elif region_num == 5:
-            return self.get_group(3, 6)         # right mid
+            return self.get_group(3, 6)  # right mid
         elif region_num == 6:
-            return self.get_group(6, 0)         # bottom left
+            return self.get_group(6, 0)  # bottom left
         elif region_num == 7:
-            return self.get_group(6, 3)         # bottom mid
+            return self.get_group(6, 3)  # bottom mid
         elif region_num == 8:
-            return self.get_group(6, 6)         # bottom right
+            return self.get_group(6, 6)  # bottom right
         raise Exception('Invalid region: %d' % region_num)
 
     def solve_cell(self, cell: Cell):
@@ -422,7 +433,7 @@ class Sudoku:
         for row in range(9):
             for col in range(9):
                 value = self.board[row][col]
-                if len(value) == 1:                  # if number given
+                if len(value) == 1:  # if number given
                     self.solve_cell(Cell(row, col, value[0]))
 
     def is_row_valid(self, row):
@@ -466,22 +477,23 @@ class Sudoku:
         """
         used = []
         for value in values:
-            if len(value) == 0:         # group must have 1 or more values
+            if len(value) == 0:  # group must have 1 or more values
                 return False
-            elif len(value) > 1:          # ignore cells that do not have single values
+            elif len(value) > 1:  # ignore cells that do not have single values
                 continue
-            if value[0] in used:        # selected value already exists in input, return False
+            if value[0] in used:  # selected value already exists in input, return False
                 return False
-            used.append(value[0])       # otherwise add to used list
+            used.append(value[0])  # otherwise add to used list
 
         return True
-   
+
     # Prints board for backtracking
     def printBoard(self, board):
         for i in range(0, 9):
             for j in range(0, 9):
                 print(board[i][j], end=" ")
             print()
+
     # Checks if the digit is valid in desired position
     def is_valid(self, digit, board, row, col):
         """
@@ -492,20 +504,20 @@ class Sudoku:
 
         """
         # Checks for repeated values in column
-        for col_counter in range(0,9):
+        for col_counter in range(0, 9):
             if board[row][col_counter] == digit:
                 return False
 
         # Checks for repeated values in row
-        for row_counter in range(0,9):
+        for row_counter in range(0, 9):
             if board[row_counter][col] == digit:
                 return False
 
         # Checks for repeated values in 3x3 grid
         row_for_small_grid = math.floor(row / 3) * 3
         col_for_small_grid = math.floor(col / 3) * 3
-        for miniRow in range(0,3):
-            for miniCol in range(0,3):
+        for miniRow in range(0, 3):
+            for miniCol in range(0, 3):
                 if board[row_for_small_grid + miniRow][col_for_small_grid + miniCol] == digit:
                     return False
 
@@ -545,20 +557,9 @@ class Sudoku:
         return self.solve_fixed_baseline_backtrack(0)
 
     def solve_fixed_baseline_backtrack(self, bt_count):
-    # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
-    # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
-    # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
-    #     puzzle = [
-    #     [0, 0, 2, 0, 9, 0, 6, 0, 0],
-    #     [6, 0, 9, 0, 0, 0, 0, 0, 0],
-    #     [4, 8, 0, 0, 0, 6, 0, 0, 0],
-    #     [0, 0, 8, 4, 0, 2, 0, 9, 0],
-    #     [3, 0, 0, 0, 0, 0, 0, 0, 7],
-    #     [0, 7, 0, 3, 0, 9, 1, 0, 0],
-    #     [0, 0, 0, 6, 0, 0, 0, 5, 1],
-    #     [0, 0, 0, 0, 0, 0, 2, 0, 4],
-    #     [0, 0, 7, 0, 8, 0, 3, 0, 0]
-    #     ]
+        # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
+        # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
+        # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
 
         # puzzle =  self.build_board_from_str(puzzle_2_medium)
         for row in range(0, 9):
@@ -576,59 +577,86 @@ class Sudoku:
         self.bt_count = bt_count
         return
 
+    # def BT_most_constrained_var(self, history: List):
+    #     if self.is_board_solved():
+    #         return True
+    #
+    #     queue_cells = most_constrained.get_sorted_constrained_vars(self)
+    #     if len(queue_cells) == 0:
+    #         return True
+    #
+    #     for q_item in queue_cells:
+    #         i, j = q_item[1]
+    #         possible_values = self.board[i][j]
+    #
+    #         for val in possible_values:
+    #             if most_constrained.is_valid_cell_value(val, self.board, i, j):
+    #                 # print(f'BT {i}, {j}, val = {val}')
+    #                 # new_sudoku = copy.deepcopy(sudoku)
+    #                 old_board = copy.deepcopy(self.board)
+    #                 self.board[i][j] = [val]
+    #                 # update val of all other cells
+    #                 try:
+    #                     self.solve_cell(Cell(i, j, val))
+    #                 except Exception as e:
+    #                     # print('Error = ', e)
+    #                     self.board = old_board
+    #                     continue
+    #
+    #                 possible_sudoku = self.BT_most_constrained_var(history + [((i, j), val)])
+    #                 if possible_sudoku != -1:
+    #                     return True
+    #                 else:
+    #                     self.board = old_board
+    #
+    #         # print(f'out of values for {i}, {j}')
+    #         return False
+    #
+    #     return False
+    #
+    # def solve_most_constrained_var(self):
+    #     return self.BT_most_constrained_var([])
 
-    def solve_most_constrained_var(self):
-        """
-        Most Constrained Variable: Pick a slot that has the least number of values in its domain.
-        @rtype: -1 or Sudoku
-        """
-        # TODO get most constrained variable
-
-
-
-    def solve(self, level=0):
-        """
-        Try to solve this puzzle using inference rules
-        All inference rules are disabled by default
-        The 'level' param inputs translate to:
-            0 = no inference (default)
-            1 = singles only
-            2 = singles and pairs only
-            3 = singles, pairs, and triples
-        """
-
-        ns = NakedSingles(self)
-        hs = HiddenSingles(self)
-        np = NakedPairs(self)
-        hp = HiddenPairs(self)
-        nt = NakedTriples(self)
-        ht = HiddenTriples(self)
-
-        while True:
-            solved_count = self.get_solved_cell_count()
-
-            if level >= 1:
-                # naked singles first
-                ns.evaluate()
-
-                # next try hidden singles
-                hs.evaluate()
-
-            if level >= 2:
-                # next try pairs
-                np.evaluate()
-                hp.evaluate()
-
-            if level >= 3:
-                # next try triples
-                nt.evaluate()
-                ht.evaluate()
-
-            # if no new cells were solved, exit
-            if solved_count == self.get_solved_cell_count():
-                break
-
-        return (ns.move_count, hs.move_count, np.move_count, hp.move_count, nt.move_count, ht.move_count)
-
-
-
+    # def solve(self, level=0):
+    #     """
+    #     Try to solve this puzzle using inference rules
+    #     All inference rules are disabled by default
+    #     The 'level' param inputs translate to:
+    #         0 = no inference (default)
+    #         1 = singles only
+    #         2 = singles and pairs only
+    #         3 = singles, pairs, and triples
+    #     """
+    #
+    #     ns = NakedSingles(self)
+    #     hs = HiddenSingles(self)
+    #     np = NakedPairs(self)
+    #     hp = HiddenPairs(self)
+    #     nt = NakedTriples(self)
+    #     ht = HiddenTriples(self)
+    #
+    #     while True:
+    #         solved_count = self.get_solved_cell_count()
+    #
+    #         if level >= 1:
+    #             # naked singles first
+    #             ns.evaluate()
+    #
+    #             # next try hidden singles
+    #             hs.evaluate()
+    #
+    #         if level >= 2:
+    #             # next try pairs
+    #             np.evaluate()
+    #             hp.evaluate()
+    #
+    #         if level >= 3:
+    #             # next try triples
+    #             nt.evaluate()
+    #             ht.evaluate()
+    #
+    #         # if no new cells were solved, exit
+    #         if solved_count == self.get_solved_cell_count():
+    #             break
+    #
+    #     return (ns.move_count, hs.move_count, np.move_count, hp.move_count, nt.move_count, ht.move_count)

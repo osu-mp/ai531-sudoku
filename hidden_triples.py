@@ -1,13 +1,10 @@
 # !/usr/bin/python3
 import itertools
-import unittest
 from typing import List
 
 from cell import Cell
 from inference import InferenceRule
-
-
-# from sudoku import Sudoku
+import sudoku
 
 
 def not_appear_other_cells(other_cells: List[Cell], poss_triple_vals: List[int]):
@@ -57,25 +54,25 @@ class HiddenTriples(InferenceRule):
             self.execute_group(cells)
             self.puzzle.is_board_valid()
 
-        # matches, triples = self.evaluate_group(cells)
-        # if self.execute_group(matches, cells, triples):
-        #     self.move_count += 1
-        #     cell_changed = True
-
         # TODO search cols
+        for col in range(9):
+            cells = self.puzzle.get_col(col)
+            self.execute_group(cells)
+            self.puzzle.is_board_valid()
+
         # TODO search regions
-
-        # TODO once the triples are identified, triples the paired values from all other cells in the group
-        # i.e. for unit test below, 4, 8, and 9 would be removed from all but cell 0,2 and cell 0,4 and 0,5
-
-        # TODO self.move_count += 1
+        for reg in range(9):
+            cells = self.puzzle.get_region(reg)
+            self.execute_group(cells)
+            self.puzzle.is_board_valid()
 
     def execute_triple(self, triple_cells: List[Cell], triple_vals: List[int]):
         for cell in triple_cells:
-            self.puzzle.board[cell.row][cell.col] = list(set(cell.val) & set(triple_vals))
-            cell.val = list(set(cell.val) & set(triple_vals))
+            new_val = sorted(list(set(cell.val) & set(triple_vals)))
+            self.puzzle.board[cell.row][cell.col] = new_val
+            cell.val = new_val
 
-    @staticmethod
+    # @staticmethod
     def execute_group(self, cells: List[Cell]):
         """
         Given a list of cells, find hidden pairs
@@ -99,11 +96,9 @@ class HiddenTriples(InferenceRule):
                         and appear_triple_cells(triple_cells, triple_vals):
                     self.execute_triple(triple_cells, triple_vals)
                     # for cell in triple_cells:
-                    # self.puzzle.board[cell.row][cell.col] = list(set(cell.val) & set(triple_vals))
-                    # print(f'update {cell.val} & {triple_vals}')
-                    # cell.val = list(set(cell.val) & set(triple_vals))
-                    # print(f'{cell.val}')
-
+                    #     self.puzzle.board[cell.row][cell.col] = list(set(cell.val) & set(triple_vals))
+                    #     cell.val = list(set(cell.val) & set(triple_vals))
+        #
         return cells
 
 
@@ -139,6 +134,16 @@ class HiddenTriples(InferenceRule):
 
 if __name__ == '__main__':
     # unittest.main()
+    EVIL_SUDOKU = '''000 006 009
+    090 300 108
+    076 000 402
+    000 800 005
+    000 502 000
+    900 003 000
+    409 000 830
+    605 004 090
+    700 100 000
+    '''
     cells = [
         Cell(0, 0, [1, 2, 6]),
         Cell(0, 1, [1, 2, 5, 6]),
@@ -150,23 +155,35 @@ if __name__ == '__main__':
         Cell(0, 7, [2, 3, 6]),
         Cell(0, 8, [2, 3, 5])
     ]
-    #
-    # expected = [
-    #     Cell(0, 0, [1, 2, 6]),
-    #     Cell(0, 1, [1, 2, 5, 6]),
-    #     Cell(0, 2, [4, 8, 9]),
-    #     Cell(0, 3, [7]),
-    #     Cell(0, 4, [4, 8]),
-    #     Cell(0, 5, [4, 8, 9]),
-    #     Cell(0, 6, [2, 3, 5, 6]),
-    #     Cell(0, 7, [2, 3, 6]),
-    #     Cell(0, 8, [2, 3, 5])
-    # ]
 
-    # actor = HiddenTriples(puzzle)
-    # from sudoku import Sudoku
-    # actor = HiddenTriples(puzzle=Sudoku())
-    # actual = HiddenTriples.execute_group(cells)
-    # print(actual)
-    pass
-    # self.assertEqual(expected, actual)
+    expected = [
+        Cell(0, 0, [1, 2, 6]),
+        Cell(0, 1, [1, 2, 5, 6]),
+        Cell(0, 2, [4, 8, 9]),
+        Cell(0, 3, [7]),
+        Cell(0, 4, [4, 8]),
+        Cell(0, 5, [8, 9]),
+        Cell(0, 6, [2, 3, 5, 6]),
+        Cell(0, 7, [2, 3, 6]),
+        Cell(0, 8, [2, 3, 5])
+    ]
+    expected_vals = [cell.val for cell in expected]
+
+    test_sudoku = sudoku.Sudoku(EVIL_SUDOKU)
+    test_sudoku.board[0][0] = [1, 2, 6]
+    test_sudoku.board[0][1] = [1, 2, 5, 6]
+    test_sudoku.board[0][2] = [4, 5, 8, 9]  # hidden triple
+    test_sudoku.board[0][3] = [7]
+    test_sudoku.board[0][4] = [1, 4, 6, 8]  # hidden triple
+    test_sudoku.board[0][5] = [2, 3, 8, 9]  # hidden triple
+    test_sudoku.board[0][6] = [2, 3, 5, 6]
+    test_sudoku.board[0][7] = [2, 3, 6]
+    test_sudoku.board[0][8] = [2, 3, 5]
+    # for i in range(1, 9):
+    #     for j in range(0, 9):
+    #         test_sudoku.board[i][j] = []
+
+    actor = HiddenTriples(puzzle=test_sudoku)
+    actor.execute_group(cells)
+    print(actor.puzzle.board[0])
+    # assert (actor.puzzle.board[0] == expected_vals)

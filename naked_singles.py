@@ -30,3 +30,5 @@ class NakedSingles(InferenceRule):
                         if changed:
                             self.move_count += 1
                             cell_changed = True
+
+        self.cell_changed = cell_changed
