@@ -10,6 +10,7 @@ import unittest
 from collections import defaultdict
 
 from naked_singles import NakedSingles
+from hidden_singles import HiddenSingles
 from simple_BT import solve_simple_BT
 from sudoku import Sudoku
 from most_constrained import *
@@ -265,8 +266,9 @@ class SudokuDataCollection(unittest.TestCase):
         avg_time = {}
         avg_backtracks = {}
 
+        # TODO: only testing easy, update to all diffs for all data
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
-
+        # all_difficulties = ['1 Easy']
         for difficulty in all_difficulties:
             total_solved[difficulty] = {}
             avg_time[difficulty] = {}
@@ -295,7 +297,7 @@ class SudokuDataCollection(unittest.TestCase):
 
                 bt = Sudoku(self.puzzles[puzzle_name])
                 solved_sudoku, counter = solve_simple_BT(bt)
-                sum_backtracks += counter
+                sum_backtracks += counter.value
 
                 if sudoku.is_board_solved():
                     solved_count += 1
@@ -322,6 +324,7 @@ class SudokuDataCollection(unittest.TestCase):
         print(f'{row} \\\\')
 
 
+        print('Total Solved')
         row = ''
         for difficulty in all_difficulties:
             pct = total_solved[difficulty] / total_puzzles[difficulty] * 100

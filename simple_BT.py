@@ -19,7 +19,14 @@ def find_next_cell(i, j):
             return None
 
 
-def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = [], cell=(0, 0), counter=0):
+class Counter:
+    def __init__(self):
+        self.value = 0
+
+    def increment(self):
+        self.value += 1
+
+def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = [], cell=(0, 0), counter=Counter()):
     # if sudoku.is_board_solved():
     #     return sudoku
 
@@ -33,7 +40,7 @@ def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRul
 
         sudoku = rule_obj.puzzle
         if sudoku.is_board_solved():
-            return sudoku
+            return sudoku, counter
 
     i, j = cell
     possible_values = sudoku.board[i][j]
@@ -43,6 +50,7 @@ def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRul
     # print(f'{i}, {j}, {possible_values}')
 
     for val in possible_values:
+
         if is_valid_cell_value(val, sudoku.board, i, j):
             # print(f'BT {i}, {j}, val = {val}')
             new_sudoku = copy.deepcopy(sudoku)
@@ -55,8 +63,9 @@ def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRul
                 continue
 
             if next_cell is not None:
-                counter += 1
                 possible_sudoku = solve_simple_BT(new_sudoku, history + [((i, j), val)], rules, next_cell, counter)
+                counter.increment()
+
                 if possible_sudoku != -1:
                     return possible_sudoku, counter
             else:
