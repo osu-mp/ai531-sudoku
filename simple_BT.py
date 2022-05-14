@@ -52,7 +52,20 @@ def solve_simple_BT(sudoku: Sudoku, rules: List[InferenceRule] = [], cell=(0, 0)
         else:
             rule_obj = rule(sudoku)
 
-            # if isinstance(rule_obj, )
+        if isinstance(rule_obj, NakedSingles):
+            utility.rule_tracker.naked_singles += 1
+        elif isinstance(rule_obj, HiddenSingles):
+            utility.rule_tracker.hidden_singles += 1
+        elif isinstance(rule_obj, NakedPairs):
+            utility.rule_tracker.naked_pairs += 1
+        elif isinstance(rule_obj, HiddenPairs):
+            utility.rule_tracker.hidden_pairs += 1
+        elif isinstance(rule_obj, NakedTriples):
+            utility.rule_tracker.naked_triples += 1
+        elif isinstance(rule_obj, HiddenTriples):
+            utility.rule_tracker.hidden_triples += 1
+
+                # if isinstance(rule_obj, )
         try:
             rule_obj.evaluate()
         except Exception as e:
@@ -134,14 +147,16 @@ def test_simple_BT_func():
     sudoku = Sudoku(EVIL_SUDOKU)
     # rules = [NakedSingles(sudoku), HiddenSingles(sudoku), NakedPairs(sudoku), HiddenPairs(sudoku), NakedTriples(sudoku)]
     # rules = [HiddenTriples(sudoku)]
-    rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
+    rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples, HiddenTriples]
     # rules = []
 
     utility.counter = 0
+    utility.rule_tracker.reset()
     solved_sudoku = solve_simple_BT(sudoku, rules, (0, 0))
     print(f'{solved_sudoku=}')
     print(f'{utility.counter=}')
     print(rules)
+    print(utility.rule_tracker)
     # print([rule.move_count for rule in rules])
 
 

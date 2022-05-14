@@ -79,6 +79,20 @@ def solve_most_constrained_var(sudoku: Sudoku, rules: List[InferenceRule] = []):
             rule_obj = rule
         else:
             rule_obj = rule(sudoku)
+
+        if isinstance(rule_obj, NakedSingles):
+            utility.rule_tracker.naked_singles += 1
+        elif isinstance(rule_obj, HiddenSingles):
+            utility.rule_tracker.hidden_singles += 1
+        elif isinstance(rule_obj, NakedPairs):
+            utility.rule_tracker.naked_pairs += 1
+        elif isinstance(rule_obj, HiddenPairs):
+            utility.rule_tracker.hidden_pairs += 1
+        elif isinstance(rule_obj, NakedTriples):
+            utility.rule_tracker.naked_triples += 1
+        elif isinstance(rule_obj, HiddenTriples):
+            utility.rule_tracker.hidden_triples += 1
+
         try:
             rule_obj.evaluate()
         except Exception as e:
@@ -141,11 +155,13 @@ def test_most_constrained_func():
     rules = [HiddenTriples]
     # rules = []
     utility.counter = 0
+    utility.rule_tracker.reset()
     solved_sudoku = solve_most_constrained_var(sudoku, rules)
     # assert solved_sudoku.is_board_solved()
     if solved_sudoku != -1:
         solved_sudoku.print()
         print(utility.counter)
+        print(utility.rule_tracker)
     else:
         print('error')
 

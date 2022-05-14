@@ -17,9 +17,9 @@ class RuleTracker():
         self.__init__()
 
     def __repr__(self):
-        print(f'ns = {self.naked_singles}, hs = {self.hidden_singles}'
-              f'np = {self.naked_pairs}, hp = {self.hidden_pairs}'
-              f'nt = {self.naked_singles}, hp = {self.naked_triples}')
+        return f'ns = {self.naked_singles}, hs = {self.hidden_singles} ' \
+               f'np = {self.naked_pairs}, hp = {self.hidden_pairs} ' \
+               f'nt = {self.naked_singles}, ht = {self.naked_triples} '
 
 
 rule_tracker = RuleTracker()

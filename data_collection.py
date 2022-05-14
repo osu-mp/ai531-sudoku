@@ -138,7 +138,10 @@ class SudokuDataCollection(unittest.TestCase):
         avg_backtracks = {}
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
         all_setting_rules = [
-            []
+            [],
+            [NakedSingles, HiddenSingles],
+            [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs],
+            [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples, HiddenTriples],
         ]
 
         for difficulty in all_difficulties:
@@ -174,8 +177,8 @@ class SudokuDataCollection(unittest.TestCase):
                     # (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
                     # (ns, hs, np, hp, nt, ht) = (0, 0, 0, 0, 0, 0)
 
-
                     utility.counter = 0
+                    utility.rule_tracker.reset()
                     solution = solve_most_constrained_var(sudoku)
                     sum_backtracks += utility.counter
 
@@ -257,6 +260,8 @@ class SudokuDataCollection(unittest.TestCase):
         for difficulty in all_difficulties:
             row += ' & %1.4f' % avg_time[difficulty][level]
         print(f'{row} \\\\')
+
+        print('Rules')
 
     def test_report_data_no_inference(self):
         """
