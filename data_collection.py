@@ -152,8 +152,8 @@ class SudokuDataCollection(unittest.TestCase):
             avg_time_mcv[difficulty] = {}
             avg_time_bt[difficulty] = {}
 
-            # print(f'\nDifficulty: {difficulty}')
-            for level in range(0, 4):
+            print(f'\nDifficulty: {difficulty}')
+            for level in range(4):
                 level_rules = all_setting_rules[level]
                 # print(f'{level_rules=}')
 
@@ -186,7 +186,10 @@ class SudokuDataCollection(unittest.TestCase):
                     utility.counter = 0
                     utility.rule_tracker.reset()
                     solution = solve_most_constrained_var(sudoku, rules=level_rules)
-                    # assert(sudoku.is_board_solved())
+                    assert solution.is_board_solved()
+                    # solution = solve_most_constrained_var(sudoku, rules=level_rules)
+                    # assert solution.is_board_solved()
+
 
                     sum_backtracks_mcv += utility.counter
                     sum_ns += utility.rule_tracker.naked_singles

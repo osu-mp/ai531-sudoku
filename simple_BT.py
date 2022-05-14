@@ -52,25 +52,25 @@ def solve_simple_BT(sudoku: Sudoku, rules: List[InferenceRule] = [], cell=(0, 0)
         else:
             rule_obj = rule(sudoku)
 
-        if isinstance(rule_obj, NakedSingles):
-            utility.rule_tracker.naked_singles += 1
-        elif isinstance(rule_obj, HiddenSingles):
-            utility.rule_tracker.hidden_singles += 1
-        elif isinstance(rule_obj, NakedPairs):
-            utility.rule_tracker.naked_pairs += 1
-        elif isinstance(rule_obj, HiddenPairs):
-            utility.rule_tracker.hidden_pairs += 1
-        elif isinstance(rule_obj, NakedTriples):
-            utility.rule_tracker.naked_triples += 1
-        elif isinstance(rule_obj, HiddenTriples):
-            utility.rule_tracker.hidden_triples += 1
-
-                # if isinstance(rule_obj, )
+            # if isinstance(rule_obj, )
         try:
             rule_obj.evaluate()
         except Exception as e:
             return -1
         # rule_obj.evaluate()
+
+        if isinstance(rule_obj, NakedSingles):
+            utility.rule_tracker.naked_singles += rule_obj.move_count
+        elif isinstance(rule_obj, HiddenSingles):
+            utility.rule_tracker.hidden_singles += rule_obj.move_count
+        elif isinstance(rule_obj, NakedPairs):
+            utility.rule_tracker.naked_pairs += rule_obj.move_count
+        elif isinstance(rule_obj, HiddenPairs):
+            utility.rule_tracker.hidden_pairs += rule_obj.move_count
+        elif isinstance(rule_obj, NakedTriples):
+            utility.rule_tracker.naked_triples += rule_obj.move_count
+        elif isinstance(rule_obj, HiddenTriples):
+            utility.rule_tracker.hidden_triples += rule_obj.move_count
 
         sudoku = rule_obj.puzzle
         if sudoku.is_board_solved():
