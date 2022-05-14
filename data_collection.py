@@ -100,7 +100,7 @@ class SudokuDataCollection(unittest.TestCase):
             start_count = sudoku.get_solved_cell_count()
             # record the naked singles, hidden singles, pairs, triples from the solve
             # (ns, hs, np, hp, nt, ht) = sudoku.solve(level=4)            # run at max level
-            # solved_sudoku = solve_most_constrained_var(sudoku)
+            solved_sudoku = solve_most_constrained_var(sudoku)
             # sudoku.print()
             solved_sudoku = solve_simple_BT(sudoku)
             # solved_sudoku.print()
@@ -171,6 +171,8 @@ class SudokuDataCollection(unittest.TestCase):
                     # (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
                     # (ns, hs, np, hp, nt, ht) = (0, 0, 0, 0, 0, 0)
                     solution = solve_most_constrained_var(sudoku, [])
+
+
                     end = time.time()
                     runtime_sum += end - start
 
@@ -248,6 +250,89 @@ class SudokuDataCollection(unittest.TestCase):
         level = 3  # report average time using all inference rules (level 3)
         for difficulty in all_difficulties:
             row += ' & %1.4f' % avg_time[difficulty][level]
+        print(f'{row} \\\\')
+
+
+    def test_report_data_no_inference(self):
+        """
+        Generate data to put into latex report
+        """
+
+        print('MCV and Fixed Baseline, No Inference')
+
+        total_puzzles = {}
+        total_solved = {}
+        avg_time = {}
+        avg_backtracks = {}
+
+        all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
+
+        for difficulty in all_difficulties:
+            total_solved[difficulty] = {}
+            avg_time[difficulty] = {}
+
+
+            puzzle_count = 0
+            solved_count = 0
+            runtime_sum = 0.
+            sum_backtracks = 0
+
+
+            for puzzle_name in self.puzzles.keys():
+                # each puzzle is named like '10 Hard' so use the name to see if it is the difficulty we're testing
+                if difficulty not in puzzle_name:
+                    continue
+
+                puzzle_count += 1
+
+                start = time.time()  # get start time
+                # solve puzzle
+                sudoku = Sudoku(self.puzzles[puzzle_name])
+                solution = solve_most_constrained_var(sudoku, [], rules=[])
+
+                end = time.time()
+                runtime_sum += end - start
+
+                bt = Sudoku(self.puzzles[puzzle_name])
+                solved_sudoku, counter = solve_simple_BT(bt)
+                sum_backtracks += counter
+
+                if sudoku.is_board_solved():
+                    solved_count += 1
+
+            total_solved[difficulty] = solved_count
+            avg_time[difficulty] = runtime_sum / puzzle_count
+            total_puzzles[difficulty] = puzzle_count
+
+
+            avg_backtracks[difficulty] = sum_backtracks / puzzle_count
+
+        print('Problems Solved')
+        row = ''
+        level = 3
+        for difficulty in all_difficulties:
+            pct = total_solved[difficulty] / total_puzzles[difficulty] * 100
+            row += ' & %2.0f \\%%' % pct
+        print(f'{row} \\\\')
+
+        print('Backtracks')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d \\' % avg_backtracks[difficulty]
+        print(f'{row} \\\\')
+
+
+        row = ''
+        for difficulty in all_difficulties:
+            pct = total_solved[difficulty] / total_puzzles[difficulty] * 100
+            row += ' & %2.0f \\%%' % pct
+        print(f'{row} \\\\')
+
+        print('Avg time')
+        row = ''
+        level = 3  # report average time using all inference rules (level 3)
+        for difficulty in all_difficulties:
+            row += ' & %1.4f' % avg_time[difficulty]
         print(f'{row} \\\\')
 
 

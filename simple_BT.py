@@ -19,7 +19,7 @@ def find_next_cell(i, j):
             return None
 
 
-def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = [], cell=(0, 0)):
+def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = [], cell=(0, 0), counter=0):
     # if sudoku.is_board_solved():
     #     return sudoku
 
@@ -55,9 +55,10 @@ def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRul
                 continue
 
             if next_cell is not None:
-                possible_sudoku = solve_simple_BT(new_sudoku, history + [((i, j), val)], rules, next_cell)
+                counter += 1
+                possible_sudoku = solve_simple_BT(new_sudoku, history + [((i, j), val)], rules, next_cell, counter)
                 if possible_sudoku != -1:
-                    return possible_sudoku
+                    return possible_sudoku, counter
             else:
                 # this turn is the last cell
                 if new_sudoku.is_board_solved():
