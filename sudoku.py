@@ -82,7 +82,6 @@ EMPTY_STR = '''000 000 000
 
 
 class Sudoku:
-    totalNodes = 0  # global counter of total nodes in total tree
 
     def __init__(self, puzzle_str=EMPTY_STR):
         """
@@ -390,11 +389,7 @@ class Sudoku:
                 # print('Removed ROW possible value of %d at %d,%d' % (val, row, neighbor.col))
                 count += 1
 
-                # TODO : if the updated cell only has one value, update its neighbors
-                # if len(self.board[row][neighbor.col]) == 1:
-                #     count += self.solve_cell(Cell(row, neighbor.col, self.board[row][neighbor.col][0]))
-
-                # TODO : mpacey added this to debug that board is always in a good state
+                # added this to debug that board is always in a good state
                 # it will decrease performance, so it should be removed once the
                 # algo has been verified more
                 self.is_board_valid()
@@ -406,11 +401,7 @@ class Sudoku:
                 # print('Removed COL possible value of %d at %d,%d' % (val, neighbor.row, col))
                 count += 1
 
-                # TODO : if the updated cell only has one value, update its neighbors
-                # if len(self.board[neighbor.row][col]) == 1:
-                #     count += self.solve_cell(Cell(row, neighbor.col, self.board[neighbor.row][col][0]))
-
-                # TODO : mpacey added this to debug that board is always in a good state
+                # added this to debug that board is always in a good state
                 # it will decrease performance, so it should be removed once the
                 # algo has been verified more
                 self.is_board_valid()
@@ -422,11 +413,7 @@ class Sudoku:
                 # print('Removed GROUP possible value of %d at %d,%d' % (val, neighbor.row, neighbor.col))
                 count += 1
 
-                # TODO : if the updated cell only has one value, update its neighbors
-                # if len(self.board[neighbor.row][neighbor.col]) == 1:
-                #     count += self.solve_cell(Cell(neighbor.row, neighbor.col, self.board[neighbor.row][neighbor.col][0]))
-
-                # TODO : mpacey added this to debug that board is always in a good state
+                # added this to debug that board is always in a good state
                 # it will decrease performance, so it should be removed once the
                 # algo has been verified more
                 self.is_board_valid()
@@ -568,9 +555,6 @@ class Sudoku:
 
     def solve_fixed_baseline_backtrack(self, bt_count):
         # Format for taking in a board(unsolved) board in the following format: [[row1],[row2],...,[row9]]
-        # TODO: Conversion from str board to a list of arrays may cause an issue? not sure. The correct format for the algo is: e.g puzzle(line 505)
-        # NOTE: test_BT.py created to individually test the fixed_baseline BT algo.
-
         # puzzle =  self.build_board_from_str(puzzle_2_medium)
         for row in range(0, 9):
             for col in range(0, 9):
@@ -586,6 +570,7 @@ class Sudoku:
         # self.printBoard(self.bt_puzzle)
         self.bt_count = bt_count
         return
+
     # def BT_most_constrained_var(self, history: List):
     #     if self.is_board_solved():
     #         return True

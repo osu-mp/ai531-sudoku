@@ -4,7 +4,7 @@ To run all tests:
 
 To run data collection (try to solve all input test puzzles in puzzles.txt)
 > python .\data_collection.py
-This currently fails but should eventually report runtimes of the various configs for each puzzle
+Some routines print out results in a format that can be imported into latex report
 
 INFO:
 Create an instance:
@@ -67,14 +67,4 @@ ___ 789 ___ 789 ___ ___ 789 789 789
 456 456 456 456 456 _2_ 456 _1_ _9_
 789 789 789 789 789 ___ 789 ___ ___
 
-TODO:
-Wadood - backtracking solver (brute force)(solve_brute_force_backtrack)
-Wadood naked pairs (started)
-Wadood hidden pairs
-Joe naked triples
-Joe hidden triples
-Joe Backtracking for MCV (solve_most_constrained_var))
-[DONE] Matthew ability to tell solve which inference rules to include/exclude
-breakout condition - 1000
-timer/data collection for solve (using previous line)
 
