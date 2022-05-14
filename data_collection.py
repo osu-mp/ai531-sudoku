@@ -152,14 +152,15 @@ class SudokuDataCollection(unittest.TestCase):
             avg_time_mcv[difficulty] = {}
             avg_time_bt[difficulty] = {}
 
-            print(f'\nDifficulty: {difficulty}')
+            # print(f'\nDifficulty: {difficulty}')
             for level in range(4):
                 level_rules = all_setting_rules[level]
                 # print(f'{level_rules=}')
 
                 puzzle_count = 0
                 solved_count = 0
-                runtime_sum = 0.
+                runtime_sum_mcv = 0.
+                runtime_sum_bt = 0.
                 sum_ns = 0
                 sum_hs = 0
                 sum_np = 0
@@ -180,8 +181,6 @@ class SudokuDataCollection(unittest.TestCase):
                     start = time.time()  # get start time
                     # solve puzzle
                     sudoku = Sudoku(self.puzzles[puzzle_name])
-                    # (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
-                    # (ns, hs, np, hp, nt, ht) = (0, 0, 0, 0, 0, 0)
 
                     utility.counter = 0
                     utility.rule_tracker.reset()
@@ -189,7 +188,9 @@ class SudokuDataCollection(unittest.TestCase):
                     assert solution.is_board_solved()
                     # solution = solve_most_constrained_var(sudoku, rules=level_rules)
                     # assert solution.is_board_solved()
+                    end = time.time()
 
+                    runtime_sum_mcv += end - start
 
                     sum_backtracks_mcv += utility.counter
                     sum_ns += utility.rule_tracker.naked_singles
@@ -199,11 +200,12 @@ class SudokuDataCollection(unittest.TestCase):
                     sum_nt += utility.rule_tracker.naked_triples
                     sum_ht += utility.rule_tracker.hidden_triples
 
-                    end = time.time()
-                    runtime_sum += end - start
-
+                    start = time.time()
                     bt = Sudoku(self.puzzles[puzzle_name])
-                    solved_sudoku = solve_simple_BT(bt)
+                    solved_sudoku = solve_simple_BT(bt, rules=level_rules)
+
+                    end = time.time()
+                    runtime_sum_bt += end - start
 
                     # if level == 3:  # only count singles/pairs/triples at highest level
                     #     sum_ns += ns
@@ -221,7 +223,7 @@ class SudokuDataCollection(unittest.TestCase):
                         solved_count += 1
 
                 total_solved[difficulty][level] = solved_count
-                avg_time[difficulty][level] = runtime_sum / puzzle_count
+                avg_time_bt[difficulty][level] = runtime_sum_bt / puzzle_count
                 total_puzzles[difficulty] = puzzle_count
 
                 # if level == 3:  # only count singles/pairs/triples at highest level
@@ -232,7 +234,8 @@ class SudokuDataCollection(unittest.TestCase):
                 avg_nt[difficulty] = sum_nt  # / puzzle_count
                 avg_ht[difficulty] = sum_ht  # / puzzle_count
 
-                avg_backtracks[difficulty] = sum_backtracks / puzzle_count
+                avg_backtracks_mcv[difficulty] = sum_backtracks_mcv / puzzle_count
+                avg_backtracks_bt[difficulty] = sum_backtracks_bt / puzzle_count
 
         print('Problems Solved')
         row = ''
@@ -242,13 +245,13 @@ class SudokuDataCollection(unittest.TestCase):
             row += ' & %2.0f \\%%' % pct
         print(f'{row} \\\\')
 
-        print('Backtracks')
+        print('Backtracks (fixed)')
         row = ''
         for difficulty in all_difficulties:
-            row += ' & %d \\' % avg_backtracks[difficulty]
+            row += ' & %d \\' % avg_backtracks_bt[difficulty]
         print(f'{row} \\\\')
 
-        for level in range(1, 4):
+        for level in range(4):
             print(f'Level {level}')
             row = ''
             for difficulty in all_difficulties:
@@ -256,7 +259,7 @@ class SudokuDataCollection(unittest.TestCase):
                 row += ' & %2.0f \\%%' % pct
             print(f'{row} \\\\')
 
-        print('Singles')
+        print('Singles ')
         row = ''
         for difficulty in all_difficulties:
             row += ' & %d + %d' % (avg_ns[difficulty], avg_hs[difficulty])
@@ -274,11 +277,18 @@ class SudokuDataCollection(unittest.TestCase):
             row += ' & %d + %d' % (avg_nt[difficulty], avg_ht[difficulty])
         print(f'{row} \\\\')
 
-        print('Avg time')
+        print('Avg time bt')
         row = ''
         level = 3  # report average time using all inference rules (level 3)
         for difficulty in all_difficulties:
-            row += ' & %1.4f' % avg_time[difficulty][level]
+            row += ' & %1.4f' % avg_time_bt[difficulty][level]
+        print(f'{row} \\\\')
+
+        print('Avg time mcv')
+        row = ''
+        level = 3  # report average time using all inference rules (level 3)
+        for difficulty in all_difficulties:
+            row += ' & %1.4f' % avg_time_mcv[difficulty][level]
         print(f'{row} \\\\')
 
     def test_report_data_no_inference(self):
@@ -356,6 +366,12 @@ class SudokuDataCollection(unittest.TestCase):
         print(f'{row} \\\\')
 
         print('Backtracks simple bt')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d \\' % avg_backtracks_bt[difficulty]
+        print(f'{row} \\\\')
+
+        print('Backtracks bt')
         row = ''
         for difficulty in all_difficulties:
             row += ' & %d \\' % avg_backtracks_bt[difficulty]
