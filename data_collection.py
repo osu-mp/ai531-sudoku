@@ -125,18 +125,20 @@ class SudokuDataCollection(unittest.TestCase):
         Generate data to put into latex report
         """
 
-        print('Fixed Baseline & Backtracking')
+        print('Fixed Baseline & Backtracking (Table 2)')
 
         total_puzzles = {}
         total_solved = {}
-        avg_time = {}
+        avg_time_mcv = {}
+        avg_time_bt = {}
         avg_ns = {}
         avg_hs = {}
         avg_np = {}
         avg_hp = {}
         avg_nt = {}
         avg_ht = {}
-        avg_backtracks = {}
+        avg_backtracks_mcv = {}
+        avg_backtracks_bt = {}
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
         all_setting_rules = [
             [],
@@ -147,12 +149,13 @@ class SudokuDataCollection(unittest.TestCase):
 
         for difficulty in all_difficulties:
             total_solved[difficulty] = {}
-            avg_time[difficulty] = {}
+            avg_time_mcv[difficulty] = {}
+            avg_time_bt[difficulty] = {}
 
-            print(f'\nDifficulty: {difficulty}')
-            for level in range(1, 4):
+            # print(f'\nDifficulty: {difficulty}')
+            for level in range(0, 4):
                 level_rules = all_setting_rules[level]
-                print(f'{level_rules=}')
+                # print(f'{level_rules=}')
 
                 puzzle_count = 0
                 solved_count = 0
@@ -163,7 +166,8 @@ class SudokuDataCollection(unittest.TestCase):
                 sum_hp = 0
                 sum_nt = 0
                 sum_ht = 0
-                sum_backtracks = 0
+                sum_backtracks_mcv = 0
+                sum_backtracks_bt = 0
 
                 # print(f'Level {level}')
                 for puzzle_name in self.puzzles.keys():
@@ -182,8 +186,9 @@ class SudokuDataCollection(unittest.TestCase):
                     utility.counter = 0
                     utility.rule_tracker.reset()
                     solution = solve_most_constrained_var(sudoku, rules=level_rules)
+                    # assert(sudoku.is_board_solved())
 
-                    sum_backtracks += utility.counter
+                    sum_backtracks_mcv += utility.counter
                     sum_ns += utility.rule_tracker.naked_singles
                     sum_hs += utility.rule_tracker.hidden_singles
                     sum_np += utility.rule_tracker.naked_pairs
@@ -193,6 +198,9 @@ class SudokuDataCollection(unittest.TestCase):
 
                     end = time.time()
                     runtime_sum += end - start
+
+                    bt = Sudoku(self.puzzles[puzzle_name])
+                    solved_sudoku = solve_simple_BT(bt)
 
                     # if level == 3:  # only count singles/pairs/triples at highest level
                     #     sum_ns += ns
@@ -206,7 +214,7 @@ class SudokuDataCollection(unittest.TestCase):
                     #     bt.solve_fixed_baseline_backtrack_entry()
                     #     sum_backtracks += bt.bt_count
 
-                    if sudoku.is_board_solved():
+                    if solution: # sudoku.is_board_solved():
                         solved_count += 1
 
                 total_solved[difficulty][level] = solved_count
@@ -275,7 +283,7 @@ class SudokuDataCollection(unittest.TestCase):
         Generate data to put into latex report
         """
 
-        print('MCV and Fixed Baseline, No Inference')
+        print('MCV and Fixed Baseline, No Inference (Table 1)')
 
         total_puzzles = {}
         total_solved = {}
