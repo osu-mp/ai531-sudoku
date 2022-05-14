@@ -9,6 +9,7 @@ import time
 import unittest
 from collections import defaultdict
 
+import utility
 from naked_singles import NakedSingles
 from hidden_singles import HiddenSingles
 from simple_BT import solve_simple_BT
@@ -272,20 +273,25 @@ class SudokuDataCollection(unittest.TestCase):
 
         total_puzzles = {}
         total_solved = {}
-        avg_time = {}
-        avg_backtracks = {}
+        avg_time_mcv = {}
+        avg_time_bt = {}
+        avg_backtracks_mcv = {}
+        avg_backtracks_bt = {}
 
         # TODO: only testing easy, update to all diffs for all data
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
         # all_difficulties = ['1 Easy']
         for difficulty in all_difficulties:
             total_solved[difficulty] = {}
-            avg_time[difficulty] = {}
+            avg_time_mcv[difficulty] = {}
+            avg_time_bt[difficulty] = {}
 
             puzzle_count = 0
             solved_count = 0
-            runtime_sum = 0.
-            sum_backtracks = 0
+            runtime_sum_mcv = 0.
+            runtime_sum_bt = 0.
+            sum_backtracks_mcv = 0
+            sum_backtracks_bt = 0
 
             for puzzle_name in self.puzzles.keys():
                 # each puzzle is named like '10 Hard' so use the name to see if it is the difficulty we're testing
@@ -296,24 +302,33 @@ class SudokuDataCollection(unittest.TestCase):
 
                 start = time.time()  # get start time
                 # solve puzzle
+                utility.counter = 0
                 sudoku = Sudoku(self.puzzles[puzzle_name])
                 solution = solve_most_constrained_var(sudoku, rules=[])
+                sum_backtracks_mcv = 0
 
                 end = time.time()
-                runtime_sum += end - start
+                runtime_sum_mcv += end - start
 
+                start = time.time()  # get start time
+                utility.counter = 0
                 bt = Sudoku(self.puzzles[puzzle_name])
-                solved_sudoku, counter = solve_simple_BT(bt)
-                sum_backtracks += counter.value
+                solved_sudoku = solve_simple_BT(bt)
+                sum_backtracks_bt += utility.counter
 
-                if sudoku.is_board_solved():
+                end = time.time()
+                runtime_sum_bt += end - start
+
+                if solved_sudoku:
                     solved_count += 1
 
             total_solved[difficulty] = solved_count
-            avg_time[difficulty] = runtime_sum / puzzle_count
+            avg_time_mcv[difficulty] = runtime_sum_mcv / puzzle_count
+            avg_time_bt[difficulty] = runtime_sum_bt / puzzle_count
             total_puzzles[difficulty] = puzzle_count
 
-            avg_backtracks[difficulty] = sum_backtracks / puzzle_count
+            avg_backtracks_mcv[difficulty] = sum_backtracks_mcv/ puzzle_count
+            avg_backtracks_bt[difficulty] = sum_backtracks_bt / puzzle_count
 
         print('Problems Solved')
         row = ''
@@ -323,10 +338,30 @@ class SudokuDataCollection(unittest.TestCase):
             row += ' & %2.0f \\%%' % pct
         print(f'{row} \\\\')
 
-        print('Backtracks')
+        print('Backtracks simple bt')
         row = ''
         for difficulty in all_difficulties:
-            row += ' & %d \\' % avg_backtracks[difficulty]
+            row += ' & %d \\' % avg_backtracks_bt[difficulty]
+        print(f'{row} \\\\')
+
+        print('Avg time bt')
+        row = ''
+        level = 3  # report average time using all inference rules (level 3)
+        for difficulty in all_difficulties:
+            row += ' & %1.4f' % avg_time_bt[difficulty]
+        print(f'{row} \\\\')
+
+        print('Backtracks mcv')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d \\' % avg_backtracks_mcv[difficulty]
+        print(f'{row} \\\\')
+
+        print('Avg time mcv')
+        row = ''
+        level = 3  # report average time using all inference rules (level 3)
+        for difficulty in all_difficulties:
+            row += ' & %1.4f' % avg_time_mcv[difficulty]
         print(f'{row} \\\\')
 
         print('Total Solved')
@@ -336,12 +371,6 @@ class SudokuDataCollection(unittest.TestCase):
             row += ' & %2.0f \\%%' % pct
         print(f'{row} \\\\')
 
-        print('Avg time')
-        row = ''
-        level = 3  # report average time using all inference rules (level 3)
-        for difficulty in all_difficulties:
-            row += ' & %1.4f' % avg_time[difficulty]
-        print(f'{row} \\\\')
 
 
 if __name__ == '__main__':
