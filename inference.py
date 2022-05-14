@@ -15,6 +15,7 @@ class InferenceRule(ABC):
     def __init__(self, puzzle):
         self.puzzle = puzzle
         self.move_count = 0
+        self.max_count = 30
 
     @abstractmethod
     def evaluate(self):

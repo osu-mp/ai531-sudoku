@@ -2,9 +2,14 @@ import copy
 from typing import List
 
 from cell import Cell
+from hidden_pairs import HiddenPairs
+from hidden_singles import HiddenSingles
 from hidden_triples import HiddenTriples
 from inference import InferenceRule
 from most_constrained import is_valid_cell_value
+from naked_pairs import NakedPairs
+from naked_singles import NakedSingles
+from naked_triples import NakedTriples
 from sudoku import Sudoku
 
 
@@ -26,12 +31,28 @@ class Counter:
     def increment(self):
         self.value += 1
 
-def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = [], cell=(0, 0), counter=Counter()):
+    def __repr__(self):
+        return str(self.value)
+
+
+# counter = Counter()
+# counter = 0
+# from utility import counter
+import utility
+
+
+def solve_simple_BT(sudoku: Sudoku, rules: List[InferenceRule] = [], cell=(0, 0)):
     # if sudoku.is_board_solved():
     #     return sudoku
+    utility.counter += 1
 
     for rule in rules:
-        rule_obj = rule(sudoku)
+        if isinstance(rule, InferenceRule):
+            rule_obj = rule
+        else:
+            rule_obj = rule(sudoku)
+
+            # if isinstance(rule_obj, )
         try:
             rule_obj.evaluate()
         except Exception as e:
@@ -40,7 +61,7 @@ def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRul
 
         sudoku = rule_obj.puzzle
         if sudoku.is_board_solved():
-            return sudoku, counter
+            return sudoku
 
     i, j = cell
     possible_values = sudoku.board[i][j]
@@ -63,20 +84,16 @@ def solve_simple_BT(sudoku: Sudoku, history: List = [], rules: List[InferenceRul
                 continue
 
             if next_cell is not None:
-                possible_sudoku = solve_simple_BT(new_sudoku, history + [((i, j), val)], rules, next_cell, counter)
-                counter.increment()
+                possible_sudoku = solve_simple_BT(new_sudoku, rules, next_cell)
 
                 if possible_sudoku != -1:
-                    return possible_sudoku, counter
+                    return possible_sudoku
             else:
                 # this turn is the last cell
                 if new_sudoku.is_board_solved():
                     return new_sudoku
 
     return -1
-    # print(f'out of values for {i}, {j}')
-    # raise Exception('Cannnot solve')
-    # return -1
 
 
 EVIL_SUDOKU = '''000 006 009
@@ -89,6 +106,16 @@ EVIL_SUDOKU = '''000 006 009
 605 004 090
 700 100 000
 '''
+
+EASY_SUDOKU = '''240 300 000
+000 520 407
+000 046 008
+610 700 084
+009 060 500
+730 005 061
+100 470 000
+302 051 000
+000 002 019'''
 
 
 def test_simple_BT_func():
@@ -103,28 +130,19 @@ def test_simple_BT_func():
     # 000 600 070
     # '''
 
-    puzzle = '''240 300 000
-000 520 407
-000 046 008
-610 700 084
-009 060 500
-730 005 061
-100 470 000
-302 051 000
-000 002 019'''
+    # sudoku = Sudoku(EASY_SUDOKU)
+    sudoku = Sudoku(EVIL_SUDOKU)
+    # rules = [NakedSingles(sudoku), HiddenSingles(sudoku), NakedPairs(sudoku), HiddenPairs(sudoku), NakedTriples(sudoku)]
+    # rules = [HiddenTriples(sudoku)]
+    rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
+    # rules = []
 
-    sudoku = Sudoku(puzzle)
-    # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
-    # rules = [HiddenTriples]
-    rules = []
-    # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
-
-    solved_sudoku = solve_simple_BT(sudoku, [], rules, (0, 0))
-    # assert solved_sudoku.is_board_solved()
-    if solved_sudoku != -1:
-        solved_sudoku.print()
-    else:
-        print('error')
+    utility.counter = 0
+    solved_sudoku = solve_simple_BT(sudoku, rules, (0, 0))
+    print(f'{solved_sudoku=}')
+    print(f'{utility.counter=}')
+    print(rules)
+    # print([rule.move_count for rule in rules])
 
 
 if __name__ == '__main__':

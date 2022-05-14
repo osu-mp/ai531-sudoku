@@ -200,6 +200,9 @@ class Sudoku:
             values.append(cell.val)
         return self.is_group_valid(values)
 
+    def __repr__(self):
+        return self.print()
+
     def print(self, simple=True, screen=True):
         """
         Print the current board

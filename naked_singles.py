@@ -4,6 +4,7 @@ import unittest
 from cell import Cell
 from inference import InferenceRule
 
+
 class NakedSingles(InferenceRule):
     def evaluate(self):
         """

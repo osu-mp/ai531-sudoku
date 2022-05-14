@@ -19,7 +19,7 @@ puzzle_file = 'puzzles.txt'
 
 
 class SudokuDataCollection(unittest.TestCase):
-# class SudokuDataCollection():
+    # class SudokuDataCollection():
 
     def setUp(self):
         self.load_puzzles()
@@ -101,16 +101,16 @@ class SudokuDataCollection(unittest.TestCase):
             start_count = sudoku.get_solved_cell_count()
             # record the naked singles, hidden singles, pairs, triples from the solve
             # (ns, hs, np, hp, nt, ht) = sudoku.solve(level=4)            # run at max level
-            solved_sudoku = solve_most_constrained_var(sudoku)
+            utility.counter = 0
+            # solved_sudoku = solve_most_constrained_var(sudoku)
             # sudoku.print()
             solved_sudoku = solve_simple_BT(sudoku)
             # solved_sudoku.print()
             end_count = solved_sudoku.get_solved_cell_count()
 
             pct = 100 * end_count / 81
-            print(f'{puzzle:15s} {start_count:2d} {end_count:2d} {pct:2.0f}%')
+            print(f'{puzzle:15s} {utility.counter=} {start_count:2d} {end_count:2d} {pct:2.0f}%')
             # csv_report += f'{puzzle},{start_count},{end_count},{end_count-start_count},{pct},{ns},{hs},{np},{hp},{nt},{ht}\n'
-
 
             if end_count == 81:
                 solved_count += 1
@@ -136,8 +136,10 @@ class SudokuDataCollection(unittest.TestCase):
         avg_nt = {}
         avg_ht = {}
         avg_backtracks = {}
-
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
+        all_setting_rules = [
+            []
+        ]
 
         for difficulty in all_difficulties:
             total_solved[difficulty] = {}
@@ -171,24 +173,27 @@ class SudokuDataCollection(unittest.TestCase):
                     sudoku = Sudoku(self.puzzles[puzzle_name])
                     # (ns, hs, np, hp, nt, ht) = sudoku.solve(level)
                     # (ns, hs, np, hp, nt, ht) = (0, 0, 0, 0, 0, 0)
-                    solution = solve_most_constrained_var(sudoku, [])
 
+
+                    utility.counter = 0
+                    solution = solve_most_constrained_var(sudoku)
+                    sum_backtracks += utility.counter
 
                     end = time.time()
                     runtime_sum += end - start
 
-                    if level == 3:  # only count singles/pairs/triples at highest level
-                        sum_ns += ns
-                        sum_hs += hs
-                        sum_np += np
-                        sum_hp += hp
-                        sum_nt += nt
-                        sum_ht += ht
-
-                        bt = Sudoku(self.puzzles[puzzle_name])
-                        bt.solve_fixed_baseline_backtrack_entry()
-                        sum_backtracks += bt.bt_count
-
+                    # if level == 3:  # only count singles/pairs/triples at highest level
+                    #     sum_ns += ns
+                    #     sum_hs += hs
+                    #     sum_np += np
+                    #     sum_hp += hp
+                    #     sum_nt += nt
+                    #     sum_ht += ht
+                    #
+                    #     bt = Sudoku(self.puzzles[puzzle_name])
+                    #     bt.solve_fixed_baseline_backtrack_entry()
+                    #     sum_backtracks += bt.bt_count
+                    #
                     if sudoku.is_board_solved():
                         solved_count += 1
 
@@ -196,15 +201,15 @@ class SudokuDataCollection(unittest.TestCase):
                 avg_time[difficulty][level] = runtime_sum / puzzle_count
                 total_puzzles[difficulty] = puzzle_count
 
-                if level == 3:  # only count singles/pairs/triples at highest level
-                    avg_ns[difficulty] = sum_ns  # / puzzle_count
-                    avg_hs[difficulty] = sum_hs  # / puzzle_count
-                    avg_np[difficulty] = sum_np  # / puzzle_count
-                    avg_hp[difficulty] = sum_hp  # / puzzle_count
-                    avg_nt[difficulty] = sum_nt  # / puzzle_count
-                    avg_ht[difficulty] = sum_ht  # / puzzle_count
-
-                    avg_backtracks[difficulty] = sum_backtracks / puzzle_count
+                # if level == 3:  # only count singles/pairs/triples at highest level
+                #     avg_ns[difficulty] = sum_ns  # / puzzle_count
+                #     avg_hs[difficulty] = sum_hs  # / puzzle_count
+                #     avg_np[difficulty] = sum_np  # / puzzle_count
+                #     avg_hp[difficulty] = sum_hp  # / puzzle_count
+                #     avg_nt[difficulty] = sum_nt  # / puzzle_count
+                #     avg_ht[difficulty] = sum_ht  # / puzzle_count
+                #
+                #     avg_backtracks[difficulty] = sum_backtracks / puzzle_count
 
         print('Problems Solved')
         row = ''
@@ -253,7 +258,6 @@ class SudokuDataCollection(unittest.TestCase):
             row += ' & %1.4f' % avg_time[difficulty][level]
         print(f'{row} \\\\')
 
-
     def test_report_data_no_inference(self):
         """
         Generate data to put into latex report
@@ -273,12 +277,10 @@ class SudokuDataCollection(unittest.TestCase):
             total_solved[difficulty] = {}
             avg_time[difficulty] = {}
 
-
             puzzle_count = 0
             solved_count = 0
             runtime_sum = 0.
             sum_backtracks = 0
-
 
             for puzzle_name in self.puzzles.keys():
                 # each puzzle is named like '10 Hard' so use the name to see if it is the difficulty we're testing
@@ -290,7 +292,7 @@ class SudokuDataCollection(unittest.TestCase):
                 start = time.time()  # get start time
                 # solve puzzle
                 sudoku = Sudoku(self.puzzles[puzzle_name])
-                solution = solve_most_constrained_var(sudoku, [], rules=[])
+                solution = solve_most_constrained_var(sudoku, rules=[])
 
                 end = time.time()
                 runtime_sum += end - start
@@ -305,7 +307,6 @@ class SudokuDataCollection(unittest.TestCase):
             total_solved[difficulty] = solved_count
             avg_time[difficulty] = runtime_sum / puzzle_count
             total_puzzles[difficulty] = puzzle_count
-
 
             avg_backtracks[difficulty] = sum_backtracks / puzzle_count
 
@@ -322,7 +323,6 @@ class SudokuDataCollection(unittest.TestCase):
         for difficulty in all_difficulties:
             row += ' & %d \\' % avg_backtracks[difficulty]
         print(f'{row} \\\\')
-
 
         print('Total Solved')
         row = ''

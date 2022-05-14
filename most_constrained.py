@@ -2,9 +2,15 @@ import copy
 import math
 from typing import List
 
+import utility
 from cell import Cell
+from hidden_pairs import HiddenPairs
+from hidden_singles import HiddenSingles
 from hidden_triples import HiddenTriples
 from inference import InferenceRule
+from naked_pairs import NakedPairs
+from naked_singles import NakedSingles
+from naked_triples import NakedTriples
 from sudoku import Sudoku
 
 
@@ -61,15 +67,18 @@ def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
     return True
 
 
-def solve_most_constrained_var(sudoku: Sudoku, history: List = [], rules: List[InferenceRule] = []):
+def solve_most_constrained_var(sudoku: Sudoku, rules: List[InferenceRule] = []):
     """
     Most Constrained Variable: Pick a slot that has the least number of values in its domain.
     """
     # if sudoku.is_board_solved():
     #     return sudoku
-
+    utility.counter += 1
     for rule in rules:
-        rule_obj = rule(sudoku)
+        if isinstance(rule, InferenceRule):
+            rule_obj = rule
+        else:
+            rule_obj = rule(sudoku)
         try:
             rule_obj.evaluate()
         except Exception as e:
@@ -102,7 +111,7 @@ def solve_most_constrained_var(sudoku: Sudoku, history: List = [], rules: List[I
                     # print('Error = ', e)
                     continue
 
-                possible_sudoku = solve_most_constrained_var(new_sudoku, history + [((i, j), val)], rules)
+                possible_sudoku = solve_most_constrained_var(new_sudoku, rules)
                 if possible_sudoku != -1:
                     return possible_sudoku
 
@@ -127,12 +136,16 @@ EVIL_SUDOKU = '''000 006 009
 
 def test_most_constrained_func():
     sudoku = Sudoku(EVIL_SUDOKU)
-    # rules = [NakedSingles, HiddenSingles, NakedPairs, HiddenPairs, NakedTriples]
+    # rules = [NakedSingles(sudoku), HiddenSingles(sudoku), NakedPairs(sudoku), HiddenPairs(sudoku), NakedTriples(sudoku)]
+    # rules = [NakedSingles(sudoku), HiddenSingles(sudoku)]
     rules = [HiddenTriples]
-    solved_sudoku = solve_most_constrained_var(sudoku, [], rules)
+    # rules = []
+    utility.counter = 0
+    solved_sudoku = solve_most_constrained_var(sudoku, rules)
     # assert solved_sudoku.is_board_solved()
     if solved_sudoku != -1:
         solved_sudoku.print()
+        print(utility.counter)
     else:
         print('error')
 
