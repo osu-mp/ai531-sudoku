@@ -18,6 +18,13 @@ from cell import Cell
 # from hidden_triples import HiddenTriples
 import math
 
+# from hidden_pairs import HiddenPairs
+# from hidden_singles import HiddenSingles
+# from hidden_triples import HiddenTriples
+# from naked_pairs import NakedPairs
+# from naked_singles import NakedSingles
+# from naked_triples import NakedTriples
+
 """
 Assignment Description
 ------------------------------------------
@@ -618,7 +625,7 @@ class Sudoku:
     #
     # def solve_most_constrained_var(self):
     #     return self.BT_most_constrained_var([])
-
+    #
     # def solve(self, level=0):
     #     """
     #     Try to solve this puzzle using inference rules

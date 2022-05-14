@@ -67,6 +67,8 @@ def solve_fixed_baseline_backtrack(self, start_row=0, start_col=0, count=0):
     return True
 
 
+
+
 def solve_most_constrained_var(sudoku: Sudoku, rules: List[InferenceRule] = []):
     """
     Most Constrained Variable: Pick a slot that has the least number of values in its domain.

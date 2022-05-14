@@ -13,6 +13,7 @@ import utility
 from naked_singles import NakedSingles
 from hidden_singles import HiddenSingles
 from simple_BT import solve_simple_BT
+from solve_no_BT import solve_no_BT
 from sudoku import Sudoku
 from most_constrained import *
 
@@ -152,10 +153,10 @@ class SudokuDataCollection(unittest.TestCase):
             avg_time_mcv[difficulty] = {}
             avg_time_bt[difficulty] = {}
 
-            # print(f'\nDifficulty: {difficulty}')
+            print(f'\nDifficulty: {difficulty}')
             for level in range(4):
                 level_rules = all_setting_rules[level]
-                # print(f'{level_rules=}')
+                print(f'{level_rules=}')
 
                 puzzle_count = 0
                 solved_count = 0
@@ -184,8 +185,10 @@ class SudokuDataCollection(unittest.TestCase):
 
                     utility.counter = 0
                     utility.rule_tracker.reset()
-                    solution = solve_most_constrained_var(sudoku, rules=level_rules)
-                    assert solution.is_board_solved()
+                    solution = solve_no_BT(sudoku, rules=level_rules)
+                    if solution is not None: # sudoku.is_board_solved():
+                        solved_count += 1
+                    # assert solution.is_board_solved()
                     # solution = solve_most_constrained_var(sudoku, rules=level_rules)
                     # assert solution.is_board_solved()
                     end = time.time()
@@ -201,13 +204,13 @@ class SudokuDataCollection(unittest.TestCase):
                     sum_nt += utility.rule_tracker.naked_triples
                     sum_ht += utility.rule_tracker.hidden_triples
 
-                    start = time.time()
-                    utility.counter = 0
-                    bt = Sudoku(self.puzzles[puzzle_name])
-                    solved_sudoku = solve_simple_BT(bt, rules=level_rules)
-                    sum_backtracks_bt += utility.counter
-                    end = time.time()
-                    runtime_sum_bt += end - start
+                    # start = time.time()
+                    # utility.counter = 0
+                    # bt = Sudoku(self.puzzles[puzzle_name])
+                    # solved_sudoku = solve_simple_BT(bt, rules=level_rules)
+                    # sum_backtracks_bt += utility.counter
+                    # end = time.time()
+                    # runtime_sum_bt += end - start
 
                     # if level == 3:  # only count singles/pairs/triples at highest level
                     #     sum_ns += ns
@@ -220,9 +223,6 @@ class SudokuDataCollection(unittest.TestCase):
                     #     bt = Sudoku(self.puzzles[puzzle_name])
                     #     bt.solve_fixed_baseline_backtrack_entry()
                     #     sum_backtracks += bt.bt_count
-
-                    if solution: # sudoku.is_board_solved():
-                        solved_count += 1
 
                 total_solved[difficulty][level] = solved_count
                 avg_time_mcv[difficulty][level] = runtime_sum_mcv / puzzle_count
