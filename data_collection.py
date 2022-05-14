@@ -193,6 +193,7 @@ class SudokuDataCollection(unittest.TestCase):
                     runtime_sum_mcv += end - start
 
                     sum_backtracks_mcv += utility.counter
+
                     sum_ns += utility.rule_tracker.naked_singles
                     sum_hs += utility.rule_tracker.hidden_singles
                     sum_np += utility.rule_tracker.naked_pairs
@@ -201,9 +202,10 @@ class SudokuDataCollection(unittest.TestCase):
                     sum_ht += utility.rule_tracker.hidden_triples
 
                     start = time.time()
+                    utility.counter = 0
                     bt = Sudoku(self.puzzles[puzzle_name])
                     solved_sudoku = solve_simple_BT(bt, rules=level_rules)
-
+                    sum_backtracks_bt += utility.counter
                     end = time.time()
                     runtime_sum_bt += end - start
 
@@ -223,6 +225,7 @@ class SudokuDataCollection(unittest.TestCase):
                         solved_count += 1
 
                 total_solved[difficulty][level] = solved_count
+                avg_time_mcv[difficulty][level] = runtime_sum_mcv / puzzle_count
                 avg_time_bt[difficulty][level] = runtime_sum_bt / puzzle_count
                 total_puzzles[difficulty] = puzzle_count
 
