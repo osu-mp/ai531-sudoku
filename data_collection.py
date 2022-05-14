@@ -131,12 +131,20 @@ class SudokuDataCollection(unittest.TestCase):
         total_solved = {}
         avg_time_mcv = {}
         avg_time_bt = {}
-        avg_ns = {}
-        avg_hs = {}
-        avg_np = {}
-        avg_hp = {}
-        avg_nt = {}
-        avg_ht = {}
+        avg_ns_mcv = {}
+        avg_hs_mcv = {}
+        avg_np_mcv = {}
+        avg_hp_mcv = {}
+        avg_nt_mcv = {}
+        avg_ht_mcv = {}
+
+        avg_ns_bt = {}
+        avg_hs_bt = {}
+        avg_np_bt = {}
+        avg_hp_bt = {}
+        avg_nt_bt = {}
+        avg_ht_bt = {}
+        
         avg_backtracks_mcv = {}
         avg_backtracks_bt = {}
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
@@ -161,12 +169,18 @@ class SudokuDataCollection(unittest.TestCase):
                 solved_count = 0
                 runtime_sum_mcv = 0.
                 runtime_sum_bt = 0.
-                sum_ns = 0
-                sum_hs = 0
-                sum_np = 0
-                sum_hp = 0
-                sum_nt = 0
-                sum_ht = 0
+                sum_ns_mcv = 0
+                sum_hs_mcv = 0
+                sum_np_mcv = 0
+                sum_hp_mcv = 0
+                sum_nt_mcv = 0
+                sum_ht_mcv = 0
+                sum_ns_bt = 0
+                sum_hs_bt = 0
+                sum_np_bt = 0
+                sum_hp_bt = 0
+                sum_nt_bt = 0
+                sum_ht_bt = 0
                 sum_backtracks_mcv = 0
                 sum_backtracks_bt = 0
 
@@ -194,32 +208,29 @@ class SudokuDataCollection(unittest.TestCase):
 
                     sum_backtracks_mcv += utility.counter
 
-                    sum_ns += utility.rule_tracker.naked_singles
-                    sum_hs += utility.rule_tracker.hidden_singles
-                    sum_np += utility.rule_tracker.naked_pairs
-                    sum_hp += utility.rule_tracker.hidden_pairs
-                    sum_nt += utility.rule_tracker.naked_triples
-                    sum_ht += utility.rule_tracker.hidden_triples
+                    sum_ns_mcv += utility.rule_tracker.naked_singles
+                    sum_hs_mcv += utility.rule_tracker.hidden_singles
+                    sum_np_mcv += utility.rule_tracker.naked_pairs
+                    sum_hp_mcv += utility.rule_tracker.hidden_pairs
+                    sum_nt_mcv += utility.rule_tracker.naked_triples
+                    sum_ht_mcv += utility.rule_tracker.hidden_triples
 
                     start = time.time()
                     utility.counter = 0
+                    utility.rule_tracker.reset()
                     bt = Sudoku(self.puzzles[puzzle_name])
                     solved_sudoku = solve_simple_BT(bt, rules=level_rules)
+
                     sum_backtracks_bt += utility.counter
                     end = time.time()
                     runtime_sum_bt += end - start
 
-                    # if level == 3:  # only count singles/pairs/triples at highest level
-                    #     sum_ns += ns
-                    #     sum_hs += hs
-                    #     sum_np += np
-                    #     sum_hp += hp
-                    #     sum_nt += nt
-                    #     sum_ht += ht
-                    #
-                    #     bt = Sudoku(self.puzzles[puzzle_name])
-                    #     bt.solve_fixed_baseline_backtrack_entry()
-                    #     sum_backtracks += bt.bt_count
+                    sum_ns_bt += utility.rule_tracker.naked_singles
+                    sum_hs_bt += utility.rule_tracker.hidden_singles
+                    sum_np_bt += utility.rule_tracker.naked_pairs
+                    sum_hp_bt += utility.rule_tracker.hidden_pairs
+                    sum_nt_bt += utility.rule_tracker.naked_triples
+                    sum_ht_bt += utility.rule_tracker.hidden_triples
 
                     if solution: # sudoku.is_board_solved():
                         solved_count += 1
@@ -230,12 +241,19 @@ class SudokuDataCollection(unittest.TestCase):
                 total_puzzles[difficulty] = puzzle_count
 
                 # if level == 3:  # only count singles/pairs/triples at highest level
-                avg_ns[difficulty] = sum_ns  # / puzzle_count
-                avg_hs[difficulty] = sum_hs  # / puzzle_count
-                avg_np[difficulty] = sum_np  # / puzzle_count
-                avg_hp[difficulty] = sum_hp  # / puzzle_count
-                avg_nt[difficulty] = sum_nt  # / puzzle_count
-                avg_ht[difficulty] = sum_ht  # / puzzle_count
+                avg_ns_mcv[difficulty] = sum_ns_mcv
+                avg_hs_mcv[difficulty] = sum_hs_mcv
+                avg_np_mcv[difficulty] = sum_np_mcv
+                avg_hp_mcv[difficulty] = sum_hp_mcv
+                avg_nt_mcv[difficulty] = sum_nt_mcv
+                avg_ht_mcv[difficulty] = sum_ht_mcv
+
+                avg_ns_bt[difficulty] = sum_ns_bt
+                avg_hs_bt[difficulty] = sum_hs_bt
+                avg_np_bt[difficulty] = sum_np_bt
+                avg_hp_bt[difficulty] = sum_hp_bt
+                avg_nt_bt[difficulty] = sum_nt_bt
+                avg_ht_bt[difficulty] = sum_ht_bt
 
                 avg_backtracks_mcv[difficulty] = sum_backtracks_mcv / puzzle_count
                 avg_backtracks_bt[difficulty] = sum_backtracks_bt / puzzle_count
@@ -254,6 +272,12 @@ class SudokuDataCollection(unittest.TestCase):
             row += ' & %d \\' % avg_backtracks_bt[difficulty]
         print(f'{row} \\\\')
 
+        print('Backtracks (mcv)')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d \\' % avg_backtracks_mcv[difficulty]
+        print(f'{row} \\\\')
+
         for level in range(4):
             print(f'Level {level}')
             row = ''
@@ -262,22 +286,22 @@ class SudokuDataCollection(unittest.TestCase):
                 row += ' & %2.0f \\%%' % pct
             print(f'{row} \\\\')
 
-        print('Singles ')
+        print('Singles bt ')
         row = ''
         for difficulty in all_difficulties:
-            row += ' & %d + %d' % (avg_ns[difficulty], avg_hs[difficulty])
+            row += ' & %d + %d' % (avg_ns_bt[difficulty], avg_hs_bt[difficulty])
         print(f'{row} \\\\')
 
-        print('Pairs')
+        print('Pairs bt')
         row = ''
         for difficulty in all_difficulties:
-            row += ' & %d + %d' % (avg_np[difficulty], avg_hp[difficulty])
+            row += ' & %d + %d' % (avg_np_bt[difficulty], avg_hp_bt[difficulty])
         print(f'{row} \\\\')
 
-        print('Triples')
+        print('Triples bt')
         row = ''
         for difficulty in all_difficulties:
-            row += ' & %d + %d' % (avg_nt[difficulty], avg_ht[difficulty])
+            row += ' & %d + %d' % (avg_nt_bt[difficulty], avg_ht_bt[difficulty])
         print(f'{row} \\\\')
 
         print('Avg time bt')
@@ -285,6 +309,24 @@ class SudokuDataCollection(unittest.TestCase):
         level = 3  # report average time using all inference rules (level 3)
         for difficulty in all_difficulties:
             row += ' & %1.4f' % avg_time_bt[difficulty][level]
+        print(f'{row} \\\\')
+
+        print('Singles mcv ')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d + %d' % (avg_ns_mcv[difficulty], avg_hs_mcv[difficulty])
+        print(f'{row} \\\\')
+
+        print('Pairs mcv')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d + %d' % (avg_np_mcv[difficulty], avg_hp_mcv[difficulty])
+        print(f'{row} \\\\')
+
+        print('Triples mcv')
+        row = ''
+        for difficulty in all_difficulties:
+            row += ' & %d + %d' % (avg_nt_mcv[difficulty], avg_ht_mcv[difficulty])
         print(f'{row} \\\\')
 
         print('Avg time mcv')
@@ -308,9 +350,7 @@ class SudokuDataCollection(unittest.TestCase):
         avg_backtracks_mcv = {}
         avg_backtracks_bt = {}
 
-        # TODO: only testing easy, update to all diffs for all data
         all_difficulties = ['Easy', 'Medium', 'Hard', 'Evil']
-        # all_difficulties = ['1 Easy']
         for difficulty in all_difficulties:
             total_solved[difficulty] = {}
             avg_time_mcv[difficulty] = {}

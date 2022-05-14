@@ -170,17 +170,6 @@ Solved cells: 33 (41%)
         (ns, hs, np, hp, nt, ht) = sudoku.solve(level=1)
         self.assertEqual(hs, 12, "There are 12 hidden singles in the 3 Hard puzzle")
 
-    def skip_test_solve_easy(self):
-        '''
-        Test solving easy puzzle
-        '''
-        # TODO
-        sudoku = Sudoku(puzzle_1_easy)
-
-        sudoku.print(simple=False)
-        sudoku.print()
-        # sudoku.solve()
-
     def test_get_bt_puzzle(self):
         """
         Unit test for get_bt_puzzle

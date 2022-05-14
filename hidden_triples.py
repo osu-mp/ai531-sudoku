@@ -54,13 +54,13 @@ class HiddenTriples(InferenceRule):
             self.execute_group(cells)
             self.puzzle.is_board_valid()
 
-        # TODO search cols
+        # search cols
         for col in range(9):
             cells = self.puzzle.get_col(col)
             self.execute_group(cells)
             self.puzzle.is_board_valid()
 
-        # TODO search regions
+        # search regions
         for reg in range(9):
             cells = self.puzzle.get_region(reg)
             self.execute_group(cells)

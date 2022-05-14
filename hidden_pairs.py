@@ -49,10 +49,6 @@ class HiddenPairs(InferenceRule):
                     cell_changed = True
                     self.puzzle.is_board_valid()
 
-            # TODO once the pairs are identified, remove the paired values from all other cells in the group
-            # i.e. for unit test below, 2 and 9 would be removed from all but cell 0,0 and cell 0,2
-
-            # TODO self.move_count += 1
 
     @staticmethod
     def evaluate_group(cells):
